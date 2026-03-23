@@ -119,6 +119,7 @@ body { font-family: 'Malgun Gothic', sans-serif; background: #f0f2f5; min-height
   display: flex; justify-content: space-between; align-items: center;
 }
 .autocomplete-list div:hover { background: #f0f6ff; }
+.autocomplete-list div.ac-active { background: #e8f0fe; border-left: 3px solid #4A90D9; }
 .autocomplete-list div .ac-name { color: #111; font-weight: 500; }
 .autocomplete-list div .ac-info { color: #999; font-size: 11px; }
 .autocomplete-list .ac-loading { color: #aaa; font-size: 12px; padding: 10px; text-align: center; }
@@ -517,6 +518,40 @@ function onItemInput(input) {
   });
 }
 
+function onItemKeydown(input, e) {
+  var wrap = input.parentNode;
+  var dropdown = wrap.querySelector('.autocomplete-list');
+  var items = dropdown.querySelectorAll('div:not(.ac-loading)');
+  if (!items.length || dropdown.style.display === 'none') return;
+
+  var current = wrap.querySelector('.ac-active');
+  var idx = -1;
+  items.forEach(function(el, i){ if (el === current) idx = i; });
+
+  if (e.key === 'ArrowDown') {
+    e.preventDefault();
+    if (current) current.classList.remove('ac-active');
+    var next = items[idx + 1] || items[0];
+    next.classList.add('ac-active');
+    next.scrollIntoView({ block: 'nearest' });
+
+  } else if (e.key === 'ArrowUp') {
+    e.preventDefault();
+    if (current) current.classList.remove('ac-active');
+    var prev = items[idx - 1] || items[items.length - 1];
+    prev.classList.add('ac-active');
+    prev.scrollIntoView({ block: 'nearest' });
+
+  } else if (e.key === 'Enter') {
+    e.preventDefault();
+    if (current) current.dispatchEvent(new MouseEvent('mousedown'));
+
+  } else if (e.key === 'Escape') {
+    dropdown.style.display = 'none';
+    if (current) current.classList.remove('ac-active');
+  }
+}
+
 // 외부 클릭 시 드롭다운 닫기
 document.addEventListener('click', function(e){
   if (!e.target.closest('.autocomplete-wrap')) {
@@ -536,7 +571,7 @@ function addItem() {
   div.innerHTML =
     '<div class="item-num">' + no + '</div>' +
     '<div class="autocomplete-wrap">' +
-      '<input type="text" class="left" placeholder="원단명 입력..." oninput="onItemInput(this)" autocomplete="off" />' +
+      '<input type="text" class="left" placeholder="원단명 입력..." oninput="onItemInput(this)" onkeydown="onItemKeydown(this, event)" autocomplete="off" />' +
       '<div class="autocomplete-list" style="display:none;"></div>' +
     '</div>' +
     '<input type="text" class="left" placeholder="색상" />' +
@@ -687,9 +722,9 @@ function generatePreview() {
 
     /* 정보 3칸 */
     '<div class="qp-inforow">' +
-      '<div class="qp-infobox"><span class="ql">수신</span><span class="qv">' + attn + '</span></div>' +
+      '<div class="qp-infobox"><span class="ql">담당자명</span><span class="qv">' + attn + '</span></div>' +
+      '<div class="qp-infobox"><span class="ql">전화번호</span><span class="qv">' + clientTel + '</span></div>' +
       '<div class="qp-infobox"><span class="ql">현장명</span><span class="qv">' + siteName + '</span></div>' +
-      '<div class="qp-infobox"><span class="ql">납품장소</span><span class="qv">' + deliveryPlace + '</span></div>' +
     '</div>' +
 
     /* 합계 금액 바 */
