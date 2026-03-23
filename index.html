@@ -537,7 +537,10 @@ function addItem() {
   div.className = 'item-row'; div.id = id;
   div.innerHTML =
     '<div class="item-num">' + no + '</div>' +
-    '<input type="text" class="left" placeholder="원단명" />' +
+    '<div class="autocomplete-wrap">' +
+      '<input type="text" class="left" placeholder="원단명 입력..." oninput="onItemInput(this)" autocomplete="off" />' +
+      '<div class="autocomplete-list" style="display:none;"></div>' +
+    '</div>' +
     '<input type="text" class="left" placeholder="색상" />' +
     '<input type="text" placeholder="1400mm" />' +
     '<input type="number" placeholder="0" min="0" oninput="calcTotal()" />' +
