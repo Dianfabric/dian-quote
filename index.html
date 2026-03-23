@@ -1544,38 +1544,107 @@ function deleteSaved(id) {
 function renderSavedList() {
   var quotes = getSavedQuotes();
   var container = document.getElementById('savedList');
+
+  // 검색창 + 목록
+  var searchVal = document.getElementById('saveSearch') ? document.getElementById('saveSearch').value : '';
+
   if (quotes.length === 0) {
-    container.innerHTML = '<div class="saved-empty">저장된 견적서가 없어요</div>';
+    container.innerHTML =
+      '<input id="saveSearch" type="text" placeholder="🔍  견적서 검색..." oninput="renderSavedList()" style="width:100%;padding:8px 12px;border:1px solid #e0e0e0;border-radius:8px;font-size:13px;font-family:inherit;margin-bottom:12px;box-sizing:border-box;">' +
+      '<div class="saved-empty">저장된 견적서가 없어요</div>';
     return;
   }
 
-  // 담당자별 그룹화
-  var groups = {};
-  quotes.forEach(function(q){
-    var key = q.staff || '미지정';
-    if (!groups[key]) groups[key] = [];
-    groups[key].push(q);
+  // 검색 필터
+  var filtered = searchVal
+    ? quotes.filter(function(q){
+        var kw = searchVal.toUpperCase();
+        return q.title.toUpperCase().includes(kw) || (q.staff||'').toUpperCase().includes(kw);
+      })
+    : quotes;
+
+  // 담당자 → 월별 2중 그룹화
+  var staffGroups = {};
+  filtered.forEach(function(q){
+    var staff = q.staff || '미지정';
+    var month = q.savedAt ? q.savedAt.substring(0, 7) : '날짜 없음'; // "2026-3"
+    if (!staffGroups[staff]) staffGroups[staff] = {};
+    if (!staffGroups[staff][month]) staffGroups[staff][month] = [];
+    staffGroups[staff][month].push(q);
   });
 
-  var html = '';
-  Object.keys(groups).forEach(function(staff){
-    html += '<div class="saved-group">';
-    html += '<div class="saved-group-title">' + staff + '</div>';
-    groups[staff].forEach(function(q){
-      html += '<div class="saved-item">' +
-        '<div class="saved-item-info">' +
-          '<div class="saved-item-name">' + q.title + '</div>' +
-          '<div class="saved-item-date">' + q.savedAt + '</div>' +
-        '</div>' +
-        '<div class="saved-item-btns">' +
-          '<button class="load-btn" onclick="loadQuote(' + q.id + ')">불러오기</button>' +
-          '<button class="del-save-btn" onclick="deleteSaved(' + q.id + ')">삭제</button>' +
-        '</div>' +
+  var html = '<input id="saveSearch" type="text" placeholder="🔍  견적서 검색..." oninput="renderSavedList()" value="' + searchVal.replace(/"/g,'&quot;') + '" style="width:100%;padding:8px 12px;border:1px solid #e0e0e0;border-radius:8px;font-size:13px;font-family:inherit;margin-bottom:12px;box-sizing:border-box;">';
+
+  if (filtered.length === 0) {
+    html += '<div class="saved-empty">검색 결과가 없어요</div>';
+    container.innerHTML = html;
+    return;
+  }
+
+  Object.keys(staffGroups).forEach(function(staff, si){
+    var staffId = 'sg_' + si;
+    var monthKeys = Object.keys(staffGroups[staff]).sort().reverse();
+    var totalCount = 0;
+    monthKeys.forEach(function(m){ totalCount += staffGroups[staff][m].length; });
+
+    html += '<div style="margin-bottom:8px;border:1px solid #eee;border-radius:8px;overflow:hidden;">';
+    // 담당자 토글 헤더
+    html += '<div onclick="toggleGroup('' + staffId + '')" style="display:flex;justify-content:space-between;align-items:center;padding:9px 12px;background:#f5f5f5;cursor:pointer;user-select:none;">' +
+      '<span style="font-size:12px;font-weight:700;color:#444;">' + staff + '</span>' +
+      '<span style="font-size:11px;color:#888;">' + totalCount + '건 <span id="' + staffId + '_ico">▼</span></span>' +
+    '</div>';
+    html += '<div id="' + staffId + '" style="display:none;">';
+
+    // 월별 토글
+    monthKeys.forEach(function(month, mi){
+      var monthId = staffId + '_m' + mi;
+      var items = staffGroups[staff][month];
+      // 월 포맷 "2026-3" → "2026년 3월"
+      var parts = month.split('-');
+      var monthLabel = parts[0] + '년 ' + parseInt(parts[1]) + '월';
+
+      html += '<div style="border-top:1px solid #f0f0f0;">';
+      html += '<div onclick="toggleGroup('' + monthId + '')" style="display:flex;justify-content:space-between;align-items:center;padding:7px 14px;background:#fafafa;cursor:pointer;user-select:none;">' +
+        '<span style="font-size:11px;font-weight:600;color:#777;">' + monthLabel + '</span>' +
+        '<span style="font-size:11px;color:#aaa;">' + items.length + '건 <span id="' + monthId + '_ico">▼</span></span>' +
       '</div>';
+      html += '<div id="' + monthId + '" style="display:none;">';
+
+      items.forEach(function(q){
+        html += '<div class="saved-item" style="border-radius:0;border-left:none;border-right:none;border-top:none;">' +
+          '<div class="saved-item-info">' +
+            '<div class="saved-item-name">' + q.title + '</div>' +
+            '<div class="saved-item-date">' + q.savedAt + '</div>' +
+          '</div>' +
+          '<div class="saved-item-btns">' +
+            '<button class="load-btn" onclick="loadQuote(' + q.id + ')">불러오기</button>' +
+            '<button class="del-save-btn" onclick="deleteSaved(' + q.id + ')">삭제</button>' +
+          '</div>' +
+        '</div>';
+      });
+
+      html += '</div></div>'; // 월 닫기
     });
-    html += '</div>';
+
+    html += '</div></div>'; // 담당자 닫기
   });
+
   container.innerHTML = html;
+
+  // 검색 포커스 유지
+  if (searchVal) {
+    var inp = document.getElementById('saveSearch');
+    if (inp) { inp.focus(); inp.setSelectionRange(inp.value.length, inp.value.length); }
+  }
+}
+
+function toggleGroup(id) {
+  var el = document.getElementById(id);
+  var ico = document.getElementById(id + '_ico');
+  if (!el) return;
+  var isOpen = el.style.display !== 'none';
+  el.style.display = isOpen ? 'none' : 'block';
+  if (ico) ico.textContent = isOpen ? '▼' : '▲';
 }
 
 // 초기화
