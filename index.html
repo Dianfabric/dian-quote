@@ -125,6 +125,33 @@ body { font-family: 'Malgun Gothic', sans-serif; background: #f0f2f5; min-height
 .autocomplete-list div.ac-active { background: #e8f0fe; border-left: 3px solid #4A90D9; }
 .autocomplete-list .ac-loading { color: #aaa; font-size: 12px; padding: 10px; text-align: center; }
 
+/* 단수정리 */
+.rounding-wrap {
+  margin-top: 10px; padding: 12px 14px;
+  border: 1px solid #e0e0e0; border-radius: 8px; background: #fafafa;
+}
+.rounding-wrap .r-title { font-size: 11px; color: #888; font-weight: 600; margin-bottom: 8px; }
+.rounding-btns { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 8px; }
+.r-btn {
+  padding: 5px 12px; font-size: 12px; border: 1px solid #ddd;
+  border-radius: 20px; background: #fff; cursor: pointer;
+  font-family: inherit; color: #555; transition: all 0.15s;
+}
+.r-btn:hover { border-color: #4A90D9; color: #4A90D9; }
+.r-btn.active { border-color: #1a1a2e; background: #1a1a2e; color: #fff; }
+.r-result {
+  font-size: 13px; font-weight: 700; color: #1a1a2e;
+  padding: 6px 10px; background: #f0f4ff; border-radius: 6px;
+  display: none;
+}
+.r-custom-wrap { display: none; margin-top: 6px; }
+.r-custom-wrap input {
+  width: 100%; padding: 7px 10px; border: 1px solid #ddd;
+  border-radius: 6px; font-size: 13px; font-family: inherit;
+  background: #fff;
+}
+.r-custom-wrap input:focus { outline: none; border-color: #4A90D9; }
+
 .generate-btn {
   width: 100%; margin-top: 24px; padding: 14px;
   background: linear-gradient(135deg, #1a1a2e, #16213e);
@@ -224,12 +251,17 @@ body { font-family: 'Malgun Gothic', sans-serif; background: #f0f2f5; min-height
 /* 계좌 */
 .qp-bank { text-align: center; margin-top: 20px; font-size: 11px; color: #999; border-top: 1px solid #eee; padding-top: 12px; }
 
+.download-btns { display: flex; gap: 10px; margin-top: 16px; }
 .download-btn {
-  margin-top: 16px; padding: 12px 36px; background: #1a1a2e; color: #fff;
-  border: none; border-radius: 8px; font-size: 14px; font-weight: 700;
-  cursor: pointer; font-family: inherit; transition: all 0.2s;
+  flex: 1; padding: 12px 20px; border: none; border-radius: 8px;
+  font-size: 14px; font-weight: 700; cursor: pointer;
+  font-family: inherit; transition: all 0.2s;
 }
-.download-btn:hover { background: #16213e; transform: translateY(-1px); }
+.download-btn.pdf { background: #1a1a2e; color: #fff; }
+.download-btn.pdf:hover { background: #16213e; transform: translateY(-1px); }
+.download-btn.jpg { background: #fff; color: #1a1a2e; border: 2px solid #1a1a2e; }
+.download-btn.jpg:hover { background: #f0f4ff; transform: translateY(-1px); }
+.download-btn:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
 
 /* ── 모바일 반응형 ── */
 @media (max-width: 768px) {
@@ -342,7 +374,34 @@ body { font-family: 'Malgun Gothic', sans-serif; background: #f0f2f5; min-height
   #toggleBtn { display: none; }
 
   /* 생성 버튼 */
-  .generate-btn { font-size: 14px; padding: 14px; }
+  /* 단수정리 */
+.rounding-wrap {
+  margin-top: 10px; padding: 12px 14px;
+  border: 1px solid #e0e0e0; border-radius: 8px; background: #fafafa;
+}
+.rounding-wrap .r-title { font-size: 11px; color: #888; font-weight: 600; margin-bottom: 8px; }
+.rounding-btns { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 8px; }
+.r-btn {
+  padding: 5px 12px; font-size: 12px; border: 1px solid #ddd;
+  border-radius: 20px; background: #fff; cursor: pointer;
+  font-family: inherit; color: #555; transition: all 0.15s;
+}
+.r-btn:hover { border-color: #4A90D9; color: #4A90D9; }
+.r-btn.active { border-color: #1a1a2e; background: #1a1a2e; color: #fff; }
+.r-result {
+  font-size: 13px; font-weight: 700; color: #1a1a2e;
+  padding: 6px 10px; background: #f0f4ff; border-radius: 6px;
+  display: none;
+}
+.r-custom-wrap { display: none; margin-top: 6px; }
+.r-custom-wrap input {
+  width: 100%; padding: 7px 10px; border: 1px solid #ddd;
+  border-radius: 6px; font-size: 13px; font-family: inherit;
+  background: #fff;
+}
+.r-custom-wrap input:focus { outline: none; border-color: #4A90D9; }
+
+.generate-btn { font-size: 14px; padding: 14px; }
 
   /* 총합계 */
   .total-display .tamount { font-size: 15px; }
@@ -474,6 +533,19 @@ body { font-family: 'Malgun Gothic', sans-serif; background: #f0f2f5; min-height
     <div class="total-display">
       <span class="tlabel">총 합계 (VAT 포함)</span>
       <span class="tamount" id="totalDisplay">₩0</span>
+    </div>
+    <div class="rounding-wrap">
+      <div class="r-title">🔢 단수정리</div>
+      <div class="rounding-btns">
+        <button class="r-btn active" onclick="setRounding('none',this)">정리 없음</button>
+        <button class="r-btn" onclick="setRounding('1000',this)">천원 단위</button>
+        <button class="r-btn" onclick="setRounding('10000',this)">만원 단위</button>
+        <button class="r-btn" onclick="setRounding('custom',this)">직접 입력</button>
+      </div>
+      <div class="r-custom-wrap" id="rCustomWrap">
+        <input type="number" id="rCustomInput" placeholder="금액 직접 입력 (예: 3340000)" oninput="calcTotal()" />
+      </div>
+      <div class="r-result" id="rResult"></div>
     </div>
   </div>
 
@@ -687,6 +759,30 @@ document.addEventListener('click', function(e){
   }
 });
 
+// 단수정리
+var _roundingMode = 'none';
+
+function setRounding(mode, btn) {
+  _roundingMode = mode;
+  document.querySelectorAll('.r-btn').forEach(function(b){ b.classList.remove('active'); });
+  btn.classList.add('active');
+  var customWrap = document.getElementById('rCustomWrap');
+  customWrap.style.display = mode === 'custom' ? 'block' : 'none';
+  calcTotal();
+}
+
+function applyRounding(grand) {
+  if (_roundingMode === '1000') {
+    return Math.round(grand / 1000) * 1000;
+  } else if (_roundingMode === '10000') {
+    return Math.round(grand / 10000) * 10000;
+  } else if (_roundingMode === 'custom') {
+    var v = parseFloat(document.getElementById('rCustomInput').value) || grand;
+    return v;
+  }
+  return grand;
+}
+
 // 품목
 var itemCounter = 0;
 function addItem() {
@@ -731,7 +827,20 @@ function calcTotal() {
     sub += (parseFloat(inputs[3].value) || 0) * (parseFloat(inputs[5].value) || 0);
   });
   var grand = sub + Math.round(sub * 0.1);
-  document.getElementById('totalDisplay').textContent = '₩' + grand.toLocaleString();
+  var rounded = applyRounding(grand);
+
+  document.getElementById('totalDisplay').textContent = '₩' + rounded.toLocaleString();
+
+  // 단수정리 결과 표시
+  var rResult = document.getElementById('rResult');
+  if (_roundingMode !== 'none' && rounded !== grand) {
+    rResult.style.display = 'block';
+    var diff = rounded - grand;
+    var sign = diff >= 0 ? '+' : '';
+    rResult.textContent = grand.toLocaleString() + '원 → ' + rounded.toLocaleString() + '원 (' + sign + diff.toLocaleString() + '원)';
+  } else {
+    rResult.style.display = 'none';
+  }
 }
 function getRows() {
   var rows = [], no = 1;
@@ -786,7 +895,7 @@ function generatePreview() {
   var rows = getRows();
   var sub = rows.reduce(function(s,r){ return s + r.amount; }, 0);
   var vat = Math.round(sub * 0.1);
-  var grand = sub + vat;
+  var grand = applyRounding(sub + vat);
 
   var quoteDate     = document.getElementById('quoteDate').value || '';
   var clientName    = document.getElementById('clientName').value || '';
@@ -888,7 +997,10 @@ function generatePreview() {
     '<div class="qp-remark"><div class="rtitle">REMARK</div>' + remarkHtml + '</div>' +
     '<div class="qp-bank">※ 계좌번호 : 기업 &nbsp; 02-6447-1221 &nbsp; 예금주 한태원 디안</div>' +
   '</div>' +
-  '<button class="download-btn" onclick="downloadPDF()">⬇ PDF 다운로드</button>';
+  '<div class="download-btns">' +
+  '<button class="download-btn pdf" onclick="downloadPDF()">⬇ PDF 다운로드</button>' +
+  '<button class="download-btn jpg" id="jpgBtn" onclick="downloadJPG()">⬇ JPG 다운로드</button>' +
+'</div>';
 
   document.getElementById('previewArea').innerHTML = html;
 }
@@ -908,6 +1020,34 @@ function downloadPDF() {
     '</style></head><body>' + preview.outerHTML + '</body></html>');
   pw.document.close();
   setTimeout(function(){ pw.print(); }, 500);
+}
+
+// JPG 다운로드
+function downloadJPG() {
+  var preview = document.getElementById('quotePDF');
+  if (!preview) return;
+  var btn = document.getElementById('jpgBtn');
+  btn.disabled = true;
+  btn.textContent = '생성 중...';
+
+  html2canvas(preview, {
+    scale: 2,
+    useCORS: true,
+    backgroundColor: '#ffffff'
+  }).then(function(canvas) {
+    var link = document.createElement('a');
+    var date = document.getElementById('quoteDate').value.replace(/\s/g,'').replace(/년|월/g,'-').replace('일','');
+    var client = document.getElementById('clientName').value || '견적서';
+    link.download = 'DiAN_견적서_' + client + '_' + date + '.jpg';
+    link.href = canvas.toDataURL('image/jpeg', 0.95);
+    link.click();
+    btn.disabled = false;
+    btn.textContent = '⬇ JPG 다운로드';
+  }).catch(function(e) {
+    console.error('JPG 생성 오류:', e);
+    btn.disabled = false;
+    btn.textContent = '⬇ JPG 다운로드';
+  });
 }
 
 // 초기화
