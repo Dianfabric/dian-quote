@@ -154,6 +154,65 @@ body { font-family: 'Malgun Gothic', sans-serif; background: #f0f2f5; min-height
 }
 .r-custom-wrap input:focus { outline: none; border-color: #4A90D9; }
 
+/* 저장/불러오기 */
+.save-section {
+  margin-bottom: 22px; border: 1px solid #e0e0e0;
+  border-radius: 10px; overflow: hidden;
+}
+.save-header {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 10px 14px; background: #f8f9fa; cursor: pointer;
+  border-bottom: 1px solid #e0e0e0;
+}
+.save-header-title { font-size: 12px; font-weight: 700; color: #444; }
+.save-header-toggle { font-size: 11px; color: #888; }
+.save-body { padding: 12px 14px; display: none; }
+.save-body.open { display: block; }
+
+.save-input-row { display: flex; gap: 8px; margin-bottom: 10px; }
+.save-input-row input {
+  flex: 1; padding: 8px 10px; border: 1px solid #ddd;
+  border-radius: 6px; font-size: 13px; font-family: inherit; background: #fafafa;
+}
+.save-input-row input:focus { outline: none; border-color: #4A90D9; }
+.save-btn {
+  padding: 8px 14px; background: #1a1a2e; color: #fff;
+  border: none; border-radius: 6px; font-size: 12px; font-weight: 700;
+  cursor: pointer; font-family: inherit; white-space: nowrap;
+}
+.save-btn:hover { background: #16213e; }
+
+.saved-list { max-height: 280px; overflow-y: auto; }
+.saved-group { margin-bottom: 10px; }
+.saved-group-title {
+  font-size: 11px; font-weight: 700; color: #888;
+  padding: 4px 6px; background: #f0f0f0; border-radius: 4px;
+  margin-bottom: 4px; letter-spacing: 0.5px;
+}
+.saved-item {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 8px 10px; border: 1px solid #eee; border-radius: 6px;
+  margin-bottom: 4px; background: #fff; transition: all 0.15s;
+}
+.saved-item:hover { border-color: #4A90D9; background: #f8fbff; }
+.saved-item-info { flex: 1; min-width: 0; }
+.saved-item-name { font-size: 12px; font-weight: 600; color: #222; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.saved-item-date { font-size: 10px; color: #aaa; margin-top: 1px; }
+.saved-item-btns { display: flex; gap: 4px; flex-shrink: 0; }
+.load-btn {
+  padding: 4px 10px; font-size: 11px; background: #f0f6ff;
+  border: 1px solid #4A90D9; border-radius: 4px; color: #4A90D9;
+  cursor: pointer; font-family: inherit;
+}
+.load-btn:hover { background: #4A90D9; color: #fff; }
+.del-save-btn {
+  padding: 4px 8px; font-size: 11px; background: #fff5f5;
+  border: 1px solid #fca5a5; border-radius: 4px; color: #dc2626;
+  cursor: pointer; font-family: inherit;
+}
+.del-save-btn:hover { background: #dc2626; color: #fff; }
+.saved-empty { text-align: center; color: #bbb; font-size: 12px; padding: 16px 0; }
+
 .generate-btn {
   width: 100%; margin-top: 24px; padding: 14px;
   background: linear-gradient(135deg, #1a1a2e, #16213e);
@@ -402,6 +461,65 @@ body { font-family: 'Malgun Gothic', sans-serif; background: #f0f2f5; min-height
   background: #fff;
 }
 .r-custom-wrap input:focus { outline: none; border-color: #4A90D9; }
+
+/* 저장/불러오기 */
+.save-section {
+  margin-bottom: 22px; border: 1px solid #e0e0e0;
+  border-radius: 10px; overflow: hidden;
+}
+.save-header {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 10px 14px; background: #f8f9fa; cursor: pointer;
+  border-bottom: 1px solid #e0e0e0;
+}
+.save-header-title { font-size: 12px; font-weight: 700; color: #444; }
+.save-header-toggle { font-size: 11px; color: #888; }
+.save-body { padding: 12px 14px; display: none; }
+.save-body.open { display: block; }
+
+.save-input-row { display: flex; gap: 8px; margin-bottom: 10px; }
+.save-input-row input {
+  flex: 1; padding: 8px 10px; border: 1px solid #ddd;
+  border-radius: 6px; font-size: 13px; font-family: inherit; background: #fafafa;
+}
+.save-input-row input:focus { outline: none; border-color: #4A90D9; }
+.save-btn {
+  padding: 8px 14px; background: #1a1a2e; color: #fff;
+  border: none; border-radius: 6px; font-size: 12px; font-weight: 700;
+  cursor: pointer; font-family: inherit; white-space: nowrap;
+}
+.save-btn:hover { background: #16213e; }
+
+.saved-list { max-height: 280px; overflow-y: auto; }
+.saved-group { margin-bottom: 10px; }
+.saved-group-title {
+  font-size: 11px; font-weight: 700; color: #888;
+  padding: 4px 6px; background: #f0f0f0; border-radius: 4px;
+  margin-bottom: 4px; letter-spacing: 0.5px;
+}
+.saved-item {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 8px 10px; border: 1px solid #eee; border-radius: 6px;
+  margin-bottom: 4px; background: #fff; transition: all 0.15s;
+}
+.saved-item:hover { border-color: #4A90D9; background: #f8fbff; }
+.saved-item-info { flex: 1; min-width: 0; }
+.saved-item-name { font-size: 12px; font-weight: 600; color: #222; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.saved-item-date { font-size: 10px; color: #aaa; margin-top: 1px; }
+.saved-item-btns { display: flex; gap: 4px; flex-shrink: 0; }
+.load-btn {
+  padding: 4px 10px; font-size: 11px; background: #f0f6ff;
+  border: 1px solid #4A90D9; border-radius: 4px; color: #4A90D9;
+  cursor: pointer; font-family: inherit;
+}
+.load-btn:hover { background: #4A90D9; color: #fff; }
+.del-save-btn {
+  padding: 4px 8px; font-size: 11px; background: #fff5f5;
+  border: 1px solid #fca5a5; border-radius: 4px; color: #dc2626;
+  cursor: pointer; font-family: inherit;
+}
+.del-save-btn:hover { background: #dc2626; color: #fff; }
+.saved-empty { text-align: center; color: #bbb; font-size: 12px; padding: 16px 0; }
 
 .generate-btn { font-size: 14px; padding: 14px; }
 
@@ -670,6 +788,21 @@ body { font-family: 'Malgun Gothic', sans-serif; background: #f0f2f5; min-height
     <div class="section-title">📝 비고 (REMARK)</div>
     <div class="field">
       <textarea id="remark" rows="4"></textarea>
+    </div>
+  </div>
+
+  <!-- 저장/불러오기 -->
+  <div class="save-section">
+    <div class="save-header" onclick="toggleSaveSection()">
+      <span class="save-header-title">💾 저장 / 불러오기</span>
+      <span class="save-header-toggle" id="saveToggleIcon">▼ 열기</span>
+    </div>
+    <div class="save-body" id="saveBody">
+      <div class="save-input-row">
+        <input type="text" id="saveTitle" placeholder="저장 이름 (비우면 수신처_현장명 자동입력)" />
+        <button class="save-btn" onclick="saveQuote()">저장</button>
+      </div>
+      <div class="saved-list" id="savedList"></div>
     </div>
   </div>
 
@@ -1266,6 +1399,159 @@ function downloadJPG() {
     btn.disabled = false;
     btn.textContent = '⬇ JPG 다운로드';
   });
+}
+
+// ── 저장/불러오기 ──
+var SAVE_KEY = 'dian_quotes';
+
+function toggleSaveSection() {
+  var body = document.getElementById('saveBody');
+  var icon = document.getElementById('saveToggleIcon');
+  var isOpen = body.classList.contains('open');
+  body.classList.toggle('open');
+  icon.textContent = isOpen ? '▼ 열기' : '▲ 닫기';
+  if (!isOpen) renderSavedList();
+}
+
+function getSavedQuotes() {
+  try { return JSON.parse(localStorage.getItem(SAVE_KEY) || '[]'); }
+  catch(e) { return []; }
+}
+
+function saveQuote() {
+  var client  = document.getElementById('clientName').value.trim() || '(수신처 없음)';
+  var site    = document.getElementById('siteName').value.trim();
+  var titleInput = document.getElementById('saveTitle').value.trim();
+  var title = titleInput || (client + (site ? '_' + site : ''));
+  var now = new Date();
+  var dateStr = now.getFullYear() + '-' + (now.getMonth()+1) + '-' + now.getDate()
+              + ' ' + now.getHours() + ':' + String(now.getMinutes()).padStart(2,'0');
+
+  // 현재 품목 수집
+  var items = [];
+  document.querySelectorAll('.item-row').forEach(function(row){
+    var inputs = row.querySelectorAll('input');
+    items.push({
+      name:   inputs[0] ? inputs[0].value : '',
+      color:  inputs[1] ? inputs[1].value : '',
+      spec:   inputs[2] ? inputs[2].value : '',
+      qty:    inputs[3] ? inputs[3].value : '',
+      unit:   inputs[4] ? inputs[4].value : '',
+      price:  inputs[5] ? inputs[5].value : '',
+      remark: inputs[6] ? inputs[6].value : ''
+    });
+  });
+
+  var quote = {
+    id: Date.now(),
+    title: title,
+    savedAt: dateStr,
+    staff: _sName + ' ' + _sRole,
+    data: {
+      quoteDate:     document.getElementById('quoteDate').value,
+      clientName:    document.getElementById('clientName').value,
+      attn:          document.getElementById('attn').value,
+      clientTel:     document.getElementById('clientTel').value,
+      siteName:      document.getElementById('siteName').value,
+      remark:        document.getElementById('remark').value,
+      roundingMode:  _roundingMode,
+      items: items
+    }
+  };
+
+  var quotes = getSavedQuotes();
+  quotes.unshift(quote); // 최신순
+  localStorage.setItem(SAVE_KEY, JSON.stringify(quotes));
+  document.getElementById('saveTitle').value = '';
+  renderSavedList();
+  alert('저장됐어요! 📁');
+}
+
+function loadQuote(id) {
+  var quotes = getSavedQuotes();
+  var q = quotes.find(function(x){ return x.id === id; });
+  if (!q) return;
+  var d = q.data;
+
+  document.getElementById('quoteDate').value   = d.quoteDate || '';
+  document.getElementById('clientName').value  = d.clientName || '';
+  document.getElementById('attn').value        = d.attn || '';
+  document.getElementById('clientTel').value   = d.clientTel || '';
+  document.getElementById('siteName').value    = d.siteName || '';
+  document.getElementById('remark').value      = d.remark || '';
+
+  // 단수정리 복원
+  if (d.roundingMode) {
+    _roundingMode = d.roundingMode;
+    document.querySelectorAll('.r-btn').forEach(function(b){ b.classList.remove('active'); });
+    var modeMap = { none:'정리 없음', '1000':'천원 단위', '10000':'만원 단위', custom:'직접 입력' };
+    document.querySelectorAll('.r-btn').forEach(function(b){
+      if (b.textContent.trim() === modeMap[d.roundingMode]) b.classList.add('active');
+    });
+  }
+
+  // 품목 복원
+  var container = document.getElementById('itemsContainer');
+  container.innerHTML = '';
+  itemCounter = 0;
+  (d.items || []).forEach(function(item){
+    addItem();
+    var row = container.lastElementChild;
+    var inputs = row.querySelectorAll('input');
+    if (inputs[0]) inputs[0].value = item.name  || '';
+    if (inputs[1]) inputs[1].value = item.color || '';
+    if (inputs[2]) inputs[2].value = item.spec  || '';
+    if (inputs[3]) inputs[3].value = item.qty   || '';
+    if (inputs[4]) inputs[4].value = item.unit  || '';
+    if (inputs[5]) inputs[5].value = item.price || '';
+    if (inputs[6]) inputs[6].value = item.remark|| '';
+  });
+  calcTotal();
+  alert('불러왔어요! ✅');
+}
+
+function deleteSaved(id) {
+  if (!confirm('삭제할까요?')) return;
+  var quotes = getSavedQuotes().filter(function(x){ return x.id !== id; });
+  localStorage.setItem(SAVE_KEY, JSON.stringify(quotes));
+  renderSavedList();
+}
+
+function renderSavedList() {
+  var quotes = getSavedQuotes();
+  var container = document.getElementById('savedList');
+  if (quotes.length === 0) {
+    container.innerHTML = '<div class="saved-empty">저장된 견적서가 없어요</div>';
+    return;
+  }
+
+  // 담당자별 그룹화
+  var groups = {};
+  quotes.forEach(function(q){
+    var key = q.staff || '미지정';
+    if (!groups[key]) groups[key] = [];
+    groups[key].push(q);
+  });
+
+  var html = '';
+  Object.keys(groups).forEach(function(staff){
+    html += '<div class="saved-group">';
+    html += '<div class="saved-group-title">' + staff + '</div>';
+    groups[staff].forEach(function(q){
+      html += '<div class="saved-item">' +
+        '<div class="saved-item-info">' +
+          '<div class="saved-item-name">' + q.title + '</div>' +
+          '<div class="saved-item-date">' + q.savedAt + '</div>' +
+        '</div>' +
+        '<div class="saved-item-btns">' +
+          '<button class="load-btn" onclick="loadQuote(' + q.id + ')">불러오기</button>' +
+          '<button class="del-save-btn" onclick="deleteSaved(' + q.id + ')">삭제</button>' +
+        '</div>' +
+      '</div>';
+    });
+    html += '</div>';
+  });
+  container.innerHTML = html;
 }
 
 // 초기화
