@@ -797,18 +797,25 @@ function onItemInput(input) {
 
   loadFabricData().then(function(data){
     var kwUpper = keyword.toUpperCase();
-    var seen = {}, unique = [];
+    var seen = {}, startsWith = [], includes = [];
     Object.values(data).forEach(function(item){
       if (!seen[item.name]) {
-        var nameMatch  = item.name.toUpperCase().includes(kwUpper);
-        var aliasMatch = item.alias && item.alias.toUpperCase().includes(kwUpper);
+        var nameUpper  = item.name.toUpperCase();
+        var aliasUpper = item.alias ? item.alias.toUpperCase() : '';
+        var nameMatch  = nameUpper.includes(kwUpper);
+        var aliasMatch = aliasUpper.includes(kwUpper);
         if (nameMatch || aliasMatch) {
           seen[item.name] = 1;
-          unique.push(item);
+          // 정확히 시작하는 것 우선
+          if (nameUpper.startsWith(kwUpper) || aliasUpper.startsWith(kwUpper)) {
+            startsWith.push(item);
+          } else {
+            includes.push(item);
+          }
         }
       }
     });
-    unique = unique.slice(0, 10);
+    var unique = startsWith.concat(includes).slice(0, 10);
 
     if (unique.length === 0) {
       dropdown.style.display = 'none';
