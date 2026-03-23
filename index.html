@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>DiAN 견적서 생성기</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <style>
 * { box-sizing: border-box; margin: 0; padding: 0; }
 body { font-family: 'Malgun Gothic', sans-serif; background: #f0f2f5; min-height: 100vh; }
@@ -1164,21 +1165,74 @@ function generatePreview() {
     '<div style="overflow-x:auto;-webkit-overflow-scrolling:touch;">' + html + '</div>';
 }
 
-// PDF 출력
+// 파일명 생성 공통 함수
+function getFileName() {
+  var client  = document.getElementById('clientName').value.trim() || '견적서';
+  var site    = document.getElementById('siteName').value.trim();
+  var date    = document.getElementById('quoteDate').value.trim()
+                  .replace(/년\s*/g,'-').replace(/월\s*/g,'-').replace(/일/g,'').trim();
+  var name = client;
+  if (site) name += '_' + site;
+  name += '_' + date;
+  return 'DiAN_견적서_' + name;
+}
+
+// PDF 다운로드 (클릭 한 번으로)
 function downloadPDF() {
   var preview = document.getElementById('quotePDF');
   if (!preview) return;
-  var pw = window.open('', '_blank');
-  var styles = document.querySelector('style').textContent;
-  pw.document.write('<!DOCTYPE html><html><head><meta charset="UTF-8"><title>DiAN 견적서</title><style>' +
-    '* { box-sizing:border-box; margin:0; padding:0; }' +
-    'body { font-family:"Malgun Gothic",sans-serif; }' +
-    styles +
-    '@page { size:A4; margin:10mm; }' +
-    '@media print { .qp { box-shadow:none; } }' +
-    '</style></head><body>' + preview.outerHTML + '</body></html>');
-  pw.document.close();
-  setTimeout(function(){ pw.print(); }, 500);
+
+  var pdfBtn = document.querySelector('.download-btn.pdf');
+  pdfBtn.disabled = true;
+  pdfBtn.textContent = '생성 중...';
+
+  html2canvas(preview, {
+    scale: 2,
+    useCORS: true,
+    backgroundColor: '#ffffff',
+    width: 794,
+    windowWidth: 900
+  }).then(function(canvas) {
+    var imgData = canvas.toDataURL('image/jpeg', 1.0);
+    var pdf = new window.jspdf.jsPDF({
+      orientation: 'portrait',
+      unit: 'mm',
+      format: 'a4'
+    });
+    var pdfW = pdf.internal.pageSize.getWidth();
+    var pdfH = pdf.internal.pageSize.getHeight();
+    var imgW = canvas.width;
+    var imgH = canvas.height;
+    var ratio = pdfW / imgW;
+    var scaledH = imgH * ratio;
+
+    // 페이지 넘김 처리
+    if (scaledH <= pdfH) {
+      pdf.addImage(imgData, 'JPEG', 0, 0, pdfW, scaledH);
+    } else {
+      var pageH = Math.floor(pdfH / ratio);
+      var y = 0;
+      while (y < imgH) {
+        var tempCanvas = document.createElement('canvas');
+        tempCanvas.width = imgW;
+        tempCanvas.height = Math.min(pageH, imgH - y);
+        var ctx = tempCanvas.getContext('2d');
+        ctx.drawImage(canvas, 0, -y);
+        var sliceData = tempCanvas.toDataURL('image/jpeg', 1.0);
+        if (y > 0) pdf.addPage();
+        pdf.addImage(sliceData, 'JPEG', 0, 0, pdfW, tempCanvas.height * ratio);
+        y += pageH;
+      }
+    }
+
+    pdf.save(getFileName() + '.pdf');
+    pdfBtn.disabled = false;
+    pdfBtn.textContent = '⬇ PDF 다운로드';
+  }).catch(function(e) {
+    console.error('PDF 생성 오류:', e);
+    pdfBtn.disabled = false;
+    pdfBtn.textContent = '⬇ PDF 다운로드';
+  });
 }
 
 // JPG 다운로드
@@ -1195,9 +1249,7 @@ function downloadJPG() {
     backgroundColor: '#ffffff'
   }).then(function(canvas) {
     var link = document.createElement('a');
-    var date = document.getElementById('quoteDate').value.replace(/\s/g,'').replace(/년|월/g,'-').replace('일','');
-    var client = document.getElementById('clientName').value || '견적서';
-    link.download = 'DiAN_견적서_' + client + '_' + date + '.jpg';
+    link.download = getFileName() + '.jpg';
     link.href = canvas.toDataURL('image/jpeg', 0.95);
     link.click();
     btn.disabled = false;
