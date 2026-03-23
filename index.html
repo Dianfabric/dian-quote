@@ -655,13 +655,11 @@ body { font-family: 'Malgun Gothic', sans-serif; background: #f0f2f5; min-height
 <!-- 폼 패널 -->
 <div class="form-panel">
   <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
-    <div style="display:flex; align-items:center; gap:10px;">
-      <h1>📄 DiAN 견적서 생성기</h1>
-      <button onclick="openLoadPanel()" style="padding:5px 12px; font-size:12px; font-weight:700; background:#f0f6ff; border:1px solid #4A90D9; border-radius:6px; cursor:pointer; font-family:inherit; color:#4A90D9; white-space:nowrap;">📂 불러오기</button>
-    </div>
+    <h1>📄 DiAN 견적서 생성기</h1>
     <div style="display:flex; flex-direction:column; align-items:flex-end; gap:5px;">
       <button onclick="togglePanel()" id="toggleBtn" style="padding:4px 10px; font-size:11px; background:#f0f0f0; border:1px solid #ddd; border-radius:6px; cursor:pointer; font-family:inherit; color:#555; white-space:nowrap;">◀ 접기</button>
       <button onclick="saveQuote()" style="padding:4px 10px; font-size:11px; font-weight:700; background:#1a1a2e; border:none; border-radius:6px; cursor:pointer; font-family:inherit; color:#fff; white-space:nowrap;">💾 저장</button>
+      <button onclick="openLoadPanel()" style="padding:4px 10px; font-size:11px; font-weight:700; background:#f0f6ff; border:1px solid #4A90D9; border-radius:6px; cursor:pointer; font-family:inherit; color:#4A90D9; white-space:nowrap;">📂 불러오기</button>
     </div>
   </div>
   <p class="subtitle">변수를 입력하면 자동으로 견적서가 완성됩니다</p>
@@ -797,16 +795,7 @@ body { font-family: 'Malgun Gothic', sans-serif; background: #f0f2f5; min-height
     </div>
   </div>
 
-  <!-- 불러오기 패널 (기본 숨김) -->
-  <div class="save-section" id="loadPanel" style="display:none;">
-    <div class="save-header" onclick="toggleSaveSection()">
-      <span class="save-header-title">📂 불러오기</span>
-      <span class="save-header-toggle" id="saveToggleIcon">▲ 닫기</span>
-    </div>
-    <div class="save-body open" id="saveBody">
-      <div class="saved-list" id="savedList"></div>
-    </div>
-  </div>
+
 
   <button class="generate-btn" onclick="generatePreview()">🖨 견적서 미리보기 생성</button>
 </div>
@@ -1323,6 +1312,7 @@ function getFileName() {
 function downloadPDF() {
   var preview = document.getElementById('quotePDF');
   if (!preview) return;
+  autoSave();
 
   var pdfBtn = document.querySelector('.download-btn.pdf');
   pdfBtn.disabled = true;
@@ -1381,6 +1371,7 @@ function downloadPDF() {
 function downloadJPG() {
   var preview = document.getElementById('quotePDF');
   if (!preview) return;
+  autoSave();
   var btn = document.getElementById('jpgBtn');
   btn.disabled = true;
   btn.textContent = '생성 중...';
@@ -1412,10 +1403,25 @@ function toggleSaveSection() {
 }
 
 function openLoadPanel() {
-  var panel = document.getElementById('loadPanel');
-  panel.style.display = 'block';
+  var overlay = document.getElementById('loadOverlay');
+  var bg = document.getElementById('loadOverlayBg');
   renderSavedList();
-  panel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  bg.style.display = 'block';
+  setTimeout(function(){ overlay.style.right = '0'; }, 10);
+}
+
+function closeLoadPanel() {
+  var overlay = document.getElementById('loadOverlay');
+  var bg = document.getElementById('loadOverlayBg');
+  overlay.style.right = '-420px';
+  setTimeout(function(){ bg.style.display = 'none'; }, 300);
+}
+
+function autoSave() {
+  // 수신처가 있을 때만 자동 저장
+  var client = document.getElementById('clientName').value.trim();
+  if (!client) return;
+  saveQuote(true); // silent 모드
 }
 
 function showToast(msg) {
@@ -1436,7 +1442,7 @@ function getSavedQuotes() {
   catch(e) { return []; }
 }
 
-function saveQuote() {
+function saveQuote(silent) {
   var client  = document.getElementById('clientName').value.trim() || '(수신처 없음)';
   var site    = document.getElementById('siteName').value.trim();
   var title = client + (site ? '_' + site : '');
@@ -1481,7 +1487,7 @@ function saveQuote() {
   localStorage.setItem(SAVE_KEY, JSON.stringify(quotes));
   document.getElementById('saveTitle').value = '';
   renderSavedList();
-  showToast('저장됐어요! 📁');
+  if (!silent) showToast('저장됐어요! 📁');
 }
 
 function loadQuote(id) {
@@ -1524,6 +1530,7 @@ function loadQuote(id) {
     if (inputs[6]) inputs[6].value = item.remark|| '';
   });
   calcTotal();
+  closeLoadPanel();
   showToast('불러왔어요! ✅');
 }
 
@@ -1604,5 +1611,25 @@ window.addEventListener('DOMContentLoaded', function(){
   addItem(); addItem(); addItem();
 });
 </script>
+
+<!-- 불러오기 오버레이 패널 -->
+<div id="loadOverlay" style="
+  position:fixed; top:0; right:-420px; width:400px; height:100vh;
+  background:#fff; box-shadow:-4px 0 24px rgba(0,0,0,0.15);
+  z-index:1000; transition:right 0.3s ease;
+  display:flex; flex-direction:column; overflow:hidden;
+">
+  <div style="display:flex; justify-content:space-between; align-items:center; padding:16px 18px; border-bottom:1px solid #eee; background:#f8f9fa;">
+    <span style="font-size:14px; font-weight:700; color:#333;">📂 저장된 견적서</span>
+    <button onclick="closeLoadPanel()" style="background:none; border:none; font-size:18px; cursor:pointer; color:#888; padding:2px 6px;">✕</button>
+  </div>
+  <div id="savedList" style="flex:1; overflow-y:auto; padding:12px 14px;"></div>
+</div>
+<!-- 불러오기 오버레이 배경 -->
+<div id="loadOverlayBg" onclick="closeLoadPanel()" style="
+  position:fixed; top:0; left:0; width:100vw; height:100vh;
+  background:rgba(0,0,0,0.2); z-index:999; display:none;
+"></div>
+
 </body>
 </html>
