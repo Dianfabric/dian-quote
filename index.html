@@ -428,81 +428,105 @@ body { font-family: 'Malgun Gothic', sans-serif; background: #f0f2f5; min-height
     border-bottom: 1px solid #e0e0e0;
   }
 
-  .preview-panel { padding: 20px 12px; }
-
-  /* 품목 헤더 숨기고 각 행을 카드형으로 */
-  .items-header { display: none !important; }
-
-  .item-row {
-    display: flex !important;
-    flex-wrap: wrap;
-    gap: 6px;
-    padding: 10px 10px 10px 8px;
-    border-radius: 10px;
-    margin-bottom: 10px;
-  }
-
-  /* NO 번호 */
-  .item-row .item-num {
-    width: 22px; height: 22px; flex-shrink: 0;
-    align-self: center;
-  }
-
-  /* 원단명 wrap - 전체 너비 */
-  .item-row .autocomplete-wrap {
-    flex: 1 1 calc(100% - 32px);
-    min-width: 0;
-  }
-
-  /* 색상 */
-  .item-row input:nth-of-type(1) { flex: 1 1 40%; min-width: 80px; }
-
-  /* 규격 */
-  .item-row input:nth-of-type(2) { flex: 1 1 25%; min-width: 70px; }
-
-  /* 수량 */
-  .item-row input:nth-of-type(3) { flex: 1 1 18%; min-width: 50px; }
-
-  /* 단위 */
-  .item-row input:nth-of-type(4) { flex: 0 0 40px; }
-
-  /* 단가 */
-  .item-row input:nth-of-type(5) { flex: 1 1 30%; min-width: 80px; }
-
-  /* 비고 */
-  .item-row input:nth-of-type(6) { flex: 1 1 40%; min-width: 80px; }
-
-  /* 삭제 버튼 */
-  .item-row .del-btn { align-self: center; flex-shrink: 0; }
-
-  /* 각 입력칸에 라벨 효과 (placeholder로 대체되어 있으므로 폰트만 조정) */
-  .item-row input { font-size: 13px; padding: 7px 8px; }
-
-  /* 담당자 그리드 */
-  .staff-grid { grid-template-columns: 1fr 1fr; }
-
-  /* 미리보기 견적서 스케일 축소 */
-  .qp {
-    width: 100% !important;
-    padding: 24px 20px;
-    font-size: 11px;
-  }
-  .qp-title { font-size: 16px; letter-spacing: 4px; }
-  .qp-logo-img { height: 40px; }
-  .qp-client { font-size: 15px; }
-  .qp-table th, .qp-table td { font-size: 10px; padding: 6px 3px; }
-  .qp-inforow { grid-template-columns: 1fr; }
-  .qp-infobox { border-right: none; border-bottom: 1px solid #eee; }
-
-  /* 다운로드 버튼 */
-  .download-btns { flex-direction: column; }
-
-  /* 단수정리 버튼 */
-  .rounding-btns { gap: 4px; }
-  .r-btn { font-size: 11px; padding: 5px 10px; }
+  .preview-panel { padding: 20px 8px; }
 
   /* field-row 모바일에서 세로 */
   .field-row { flex-direction: column; }
+
+  /* 담당자 그리드 2열 유지 */
+  .staff-grid { grid-template-columns: 1fr 1fr; }
+
+  /* ── 품목 목록: 헤더 숨기고 카드형 2줄 레이아웃 ── */
+  .items-header { display: none !important; }
+
+  .item-row {
+    display: grid !important;
+    grid-template-columns: 26px 1fr 26px;
+    grid-template-rows: auto auto;
+    gap: 6px;
+    padding: 10px 8px;
+    border-radius: 10px;
+    margin-bottom: 10px;
+    border: 1px solid #e8e8e8;
+    background: #fafafa;
+  }
+
+  /* NO 번호 - 1행 1열 */
+  .item-row .item-num {
+    grid-row: 1; grid-column: 1;
+    align-self: center;
+  }
+
+  /* 원단명 wrap - 1행 2열 (넓게) */
+  .item-row .autocomplete-wrap {
+    grid-row: 1; grid-column: 2;
+    width: 100%;
+  }
+  .item-row .autocomplete-wrap input {
+    width: 100%; font-size: 14px; padding: 8px 10px;
+  }
+
+  /* 삭제 버튼 - 1행 3열 */
+  .item-row .del-btn {
+    grid-row: 1; grid-column: 3;
+    align-self: center;
+  }
+
+  /* 2행: 나머지 입력칸들을 가로로 나열 */
+  .item-row > input {
+    grid-row: 2;
+    font-size: 12px; padding: 6px 8px;
+  }
+
+  /* 색상 - 2행에서 넓게 */
+  .item-row > input:nth-of-type(1) {
+    grid-column: 1 / 4;
+  }
+
+  /* 규격·수량·단위·단가·비고 - 2행에서 flex로 */
+  .item-row {
+    position: relative;
+  }
+
+  /* 2번째 줄 래퍼 만들기 위해 JS로 처리하기보다 CSS로 해결 */
+  .item-row > input:nth-of-type(2),
+  .item-row > input:nth-of-type(3),
+  .item-row > input:nth-of-type(4),
+  .item-row > input:nth-of-type(5),
+  .item-row > input:nth-of-type(6) {
+    grid-row: 3;
+  }
+
+  .item-row > input:nth-of-type(2) { grid-column: 1 / 4; } /* 색상 전체 */
+
+  /* 규격/수량/단위/단가/비고를 별도 줄로 */
+  .item-row {
+    grid-template-columns: 26px 1fr 26px;
+    grid-template-rows: auto auto auto auto;
+  }
+
+  .item-row > input:nth-of-type(3) { grid-row: 4; grid-column: 1 / 2; } /* 규격 */
+  .item-row > input:nth-of-type(4) { grid-row: 4; grid-column: 2 / 3; } /* 수량 */
+  .item-row > input:nth-of-type(5) { grid-row: 5; grid-column: 1 / 2; } /* 단위 */
+  .item-row > input:nth-of-type(6) { grid-row: 5; grid-column: 2 / 3; } /* 단가 */
+  .item-row > input:nth-of-type(7) { grid-row: 6; grid-column: 1 / 4; } /* 비고 */
+
+  /* ── 미리보기 견적서: 가로 스크롤 ── */
+  .preview-panel { overflow-x: auto; }
+  .qp {
+    width: 794px !important;
+    min-width: 794px;
+    transform-origin: top left;
+    font-size: 13px;
+  }
+
+  /* 다운로드 버튼 */
+  .download-btns { flex-direction: column; gap: 8px; }
+  .download-btn { text-align: center; }
+
+  /* 단수정리 */
+  .rounding-btns { gap: 4px; flex-wrap: wrap; }
+  .r-btn { font-size: 11px; padding: 5px 10px; }
 }
 </style>
 </head>
@@ -884,19 +908,54 @@ function addItem() {
   var no = container.querySelectorAll('.item-row').length + 1;
   var div = document.createElement('div');
   div.className = 'item-row'; div.id = id;
-  div.innerHTML =
-    '<div class="item-num">' + no + '</div>' +
-    '<div class="autocomplete-wrap">' +
-      '<input type="text" class="left" placeholder="원단명 입력..." oninput="onItemInput(this)" onkeydown="onItemKeydown(this, event)" autocomplete="off" />' +
-      '<div class="autocomplete-list" style="display:none;"></div>' +
-    '</div>' +
-    '<input type="text" class="left" placeholder="색상" />' +
-    '<input type="text" placeholder="1400mm" />' +
-    '<input type="number" placeholder="0" min="0" oninput="calcTotal()" />' +
-    '<input type="text" placeholder="Y" />' +
-    '<input type="number" placeholder="0" min="0" oninput="calcTotal()" />' +
-    '<input type="text" class="left" placeholder="비고" />' +
-    '<button class="del-btn" onclick="removeItem(\'' + id + '\')">×</button>';
+
+  var isMobile = window.innerWidth <= 768;
+
+  if (isMobile) {
+    // 모바일: 2줄 카드형
+    div.innerHTML =
+      // 1줄: NO + 원단명 + 삭제
+      '<div class="item-num">' + no + '</div>' +
+      '<div class="autocomplete-wrap" style="flex:1;min-width:0;">' +
+        '<input type="text" class="left" placeholder="원단명 입력..." oninput="onItemInput(this)" onkeydown="onItemKeydown(this, event)" autocomplete="off" style="width:100%;font-size:15px;padding:9px 10px;" />' +
+        '<div class="autocomplete-list" style="display:none;"></div>' +
+      '</div>' +
+      '<button class="del-btn" onclick="removeItem(\'' + id + '\')">×</button>' +
+      // 2줄: 색상 전체
+      '<div class="m-row" style="display:flex;gap:6px;grid-column:1/-1;">' +
+        '<input type="text" class="left" placeholder="색상 (#번호)" style="flex:1;font-size:13px;" />' +
+      '</div>' +
+      // 3줄: 규격 / 수량 / 단위
+      '<div class="m-row" style="display:flex;gap:6px;grid-column:1/-1;">' +
+        '<input type="text" placeholder="규격(폭)" style="flex:2;font-size:13px;" />' +
+        '<input type="number" placeholder="수량" oninput="calcTotal()" style="flex:1;font-size:13px;" />' +
+        '<input type="text" placeholder="단위" style="flex:1;font-size:13px;" />' +
+      '</div>' +
+      // 4줄: 단가 / 비고
+      '<div class="m-row" style="display:flex;gap:6px;grid-column:1/-1;">' +
+        '<input type="number" placeholder="단가(원)" min="0" oninput="calcTotal()" style="flex:1;font-size:13px;" />' +
+        '<input type="text" class="left" placeholder="비고" style="flex:2;font-size:13px;" />' +
+      '</div>';
+
+    // 모바일용 item-row 스타일
+    div.style.cssText = 'display:grid;grid-template-columns:26px 1fr 26px;gap:6px;padding:10px 8px;border-radius:10px;margin-bottom:10px;border:1px solid #e8e8e8;background:#fafafa;';
+  } else {
+    // 데스크탑
+    div.innerHTML =
+      '<div class="item-num">' + no + '</div>' +
+      '<div class="autocomplete-wrap">' +
+        '<input type="text" class="left" placeholder="원단명 입력..." oninput="onItemInput(this)" onkeydown="onItemKeydown(this, event)" autocomplete="off" />' +
+        '<div class="autocomplete-list" style="display:none;"></div>' +
+      '</div>' +
+      '<input type="text" class="left" placeholder="색상 (#번호)" />' +
+      '<input type="text" placeholder="규격(폭)" />' +
+      '<input type="number" placeholder="수량" oninput="calcTotal()" />' +
+      '<input type="text" placeholder="단위" />' +
+      '<input type="number" placeholder="단가" min="0" oninput="calcTotal()" />' +
+      '<input type="text" class="left" placeholder="비고" />' +
+      '<button class="del-btn" onclick="removeItem(\'' + id + '\')">×</button>';
+  }
+
   container.appendChild(div);
   calcTotal();
 }
@@ -911,12 +970,19 @@ function renumber() {
     row.querySelector('.item-num').textContent = idx + 1;
   });
 }
+function getInputs(row) {
+  // 데스크탑: input 직접, 모바일: m-row 안에 있음
+  var all = row.querySelectorAll('input');
+  return all; // 순서: [0]=원단명, [1]=색상, [2]=규격, [3]=수량, [4]=단위, [5]=단가, [6]=비고
+}
+
 function calcTotal() {
   var sub = 0;
   document.querySelectorAll('.item-row').forEach(function(row){
-    var inputs = row.querySelectorAll('input');
-    // inputs: [0]=원단명, [1]=색상, [2]=규격, [3]=수량, [4]=단위, [5]=단가, [6]=비고
-    sub += (parseFloat(inputs[3].value) || 0) * (parseFloat(inputs[5].value) || 0);
+    var inputs = getInputs(row);
+    var qty   = parseFloat(inputs[3].value) || 0;
+    var price = parseFloat(inputs[5].value) || 0;
+    sub += qty * price;
   });
   var grand = sub + Math.round(sub * 0.1);
   var rounded = applyRounding(grand);
@@ -1094,7 +1160,8 @@ function generatePreview() {
   '<button class="download-btn jpg" id="jpgBtn" onclick="downloadJPG()">⬇ JPG 다운로드</button>' +
 '</div>';
 
-  document.getElementById('previewArea').innerHTML = html;
+  document.getElementById('previewArea').innerHTML =
+    '<div style="overflow-x:auto;-webkit-overflow-scrolling:touch;">' + html + '</div>';
 }
 
 // PDF 출력
