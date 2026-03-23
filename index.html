@@ -553,15 +553,15 @@ function numKor(n){
     if(ch){
       var s='';
       var t=Math.floor(ch/1000), h=Math.floor((ch%1000)/100), ten=Math.floor((ch%100)/10), one=ch%10;
-      if(t) s+=(t>1?d[t]:'')+\'천\';
-      if(h) s+=(h>1?d[h]:'')+\'백\';
-      if(ten) s+=(ten>1?d[ten]:'')+\'십\';
+      if(t) s+=(t>1?d[t]:'')+'천';
+      if(h) s+=(h>1?d[h]:'')+'백';
+      if(ten) s+=(ten>1?d[ten]:'')+'십';
       if(one) s+=d[one];
       res=s+u[ui]+res;
     }
     n=Math.floor(n/10000); ui++;
   }
-  return res+\'원정\';
+  return res+'원정';
 }
 
 // 파일명
