@@ -431,7 +431,7 @@ var _fabricData = null; // { 제품명: { spec, price, material } }
 function loadFabricData() {
   if (_fabricData) return Promise.resolve(_fabricData);
   // 한글 시트명을 직접 인코딩
-  var sheetName = encodeURIComponent('소름단가표') + '!A2:F11741';
+  var sheetName = encodeURIComponent('쇼룸단가표!A2:F');
   var url = 'https://sheets.googleapis.com/v4/spreadsheets/' + SHEET_ID +
             '/values/' + sheetName + '?key=' + API_KEY;
   console.log('[DiAN] 원단 데이터 로딩 중...', url);
