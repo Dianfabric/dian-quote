@@ -478,33 +478,35 @@ function loadFabricData() {
 function onItemInput(input) {
   var wrap = input.parentNode;
   var dropdown = wrap.querySelector('.autocomplete-list');
-  var keyword = input.value.trim().toUpperCase();
-  if (!keyword) { dropdown.style.display = 'none'; return; }
+  var keyword = input.value.trim();
+  if (keyword.length < 1) { dropdown.style.display = 'none'; return; }
 
   dropdown.innerHTML = '<div class="ac-loading">검색 중...</div>';
   dropdown.style.display = 'block';
 
   loadFabricData().then(function(data){
-    var matches = Object.values(data).filter(function(item){
-      return item.name.toUpperCase().includes(keyword);
-    });
-    // 중복 제거
+    var kwUpper = keyword.toUpperCase();
     var seen = {}, unique = [];
-    matches.forEach(function(m){ if(!seen[m.name]){ seen[m.name]=1; unique.push(m); } });
+    Object.values(data).forEach(function(item){
+      if (!seen[item.name] && item.name.toUpperCase().includes(kwUpper)) {
+        seen[item.name] = 1;
+        unique.push(item);
+      }
+    });
     unique = unique.slice(0, 10);
 
     if (unique.length === 0) {
-      dropdown.innerHTML = '<div class="ac-loading">검색 결과 없음</div>';
+      dropdown.style.display = 'none';
       return;
     }
     dropdown.innerHTML = '';
     unique.forEach(function(item){
       var div = document.createElement('div');
       div.innerHTML = '<span class="ac-name">' + item.name + '</span>' +
-                      '<span class="ac-info">' + item.spec + ' / ' + parseInt(item.price).toLocaleString() + '원</span>';
-      div.onclick = function(){
+                      '<span class="ac-info">' + item.spec + ' &nbsp;|&nbsp; ' + parseInt(item.price || 0).toLocaleString() + '원/Y</span>';
+      div.onmousedown = function(e){
+        e.preventDefault();
         input.value = item.name;
-        // 같은 item-row에서 규격(idx 2)와 단가(idx 5) 자동 채우기
         var row = wrap.closest('.item-row');
         var inputs = row.querySelectorAll('input');
         inputs[2].value = item.spec;
@@ -762,6 +764,12 @@ window.addEventListener('DOMContentLoaded', function(){
   var t = new Date();
   document.getElementById('quoteDate').value =
     t.getFullYear() + '년 ' + (t.getMonth()+1) + '월 ' + t.getDate() + '일';
+
+  // 페이지 로드 시 원단 데이터 미리 로딩
+  loadFabricData().then(function(data){
+    var cnt = Object.keys(data).length;
+    console.log('[DiAN] 원단 데이터 준비 완료:', cnt + '개');
+  });
 
   document.getElementById('remark').value =
     '부가세 포함 금액입니다.\n커팅 해 출고 된 원단은 반품이 불가합니다.\n발주 후 2~3일 후 출고 됩니다.';
