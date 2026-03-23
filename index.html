@@ -430,16 +430,20 @@ var _fabricData = null; // { 제품명: { spec, price, material } }
 
 function loadFabricData() {
   if (_fabricData) return Promise.resolve(_fabricData);
-  // XMLHttpRequest로 CORS 우회 (no-cors 환경 대응)
+  // 한글 시트명을 직접 인코딩
+  var sheetName = encodeURIComponent('소름단가표') + '!A2:F11741';
   var url = 'https://sheets.googleapis.com/v4/spreadsheets/' + SHEET_ID +
-            '/values/' + encodeURIComponent(SHEET_RANGE) + '?key=' + API_KEY;
+            '/values/' + sheetName + '?key=' + API_KEY;
+  console.log('[DiAN] 원단 데이터 로딩 중...', url);
   return new Promise(function(resolve) {
     var xhr = new XMLHttpRequest();
     xhr.open('GET', url, true);
     xhr.onload = function() {
+      console.log('[DiAN] API 응답 상태:', xhr.status);
       if (xhr.status === 200) {
         try {
           var data = JSON.parse(xhr.responseText);
+          console.log('[DiAN] 데이터 rows:', (data.values || []).length + '개');
           _fabricData = {};
           (data.values || []).forEach(function(row){
             var name  = (row[0] || '').trim();
@@ -452,18 +456,19 @@ function loadFabricData() {
               if (alias) _fabricData[alias.toUpperCase()] = entry;
             }
           });
+          console.log('[DiAN] 로딩 완료! 총', Object.keys(_fabricData).length + '개 원단');
           resolve(_fabricData);
         } catch(e) {
-          console.error('파싱 오류:', e);
+          console.error('[DiAN] 파싱 오류:', e);
           resolve({});
         }
       } else {
-        console.error('API 오류:', xhr.status, xhr.responseText);
+        console.error('[DiAN] API 오류:', xhr.status, xhr.responseText);
         resolve({});
       }
     };
     xhr.onerror = function() {
-      console.error('네트워크 오류 - CORS 문제일 수 있습니다');
+      console.error('[DiAN] 네트워크 오류');
       resolve({});
     };
     xhr.send();
