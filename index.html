@@ -655,8 +655,14 @@ body { font-family: 'Malgun Gothic', sans-serif; background: #f0f2f5; min-height
 <!-- 폼 패널 -->
 <div class="form-panel">
   <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
-    <h1>📄 DiAN 견적서 생성기</h1>
-    <button onclick="togglePanel()" id="toggleBtn" style="padding:4px 10px; font-size:11px; background:#f0f0f0; border:1px solid #ddd; border-radius:6px; cursor:pointer; font-family:inherit; color:#555; white-space:nowrap;">◀ 접기</button>
+    <div style="display:flex; align-items:center; gap:10px;">
+      <h1>📄 DiAN 견적서 생성기</h1>
+      <button onclick="openLoadPanel()" style="padding:5px 12px; font-size:12px; font-weight:700; background:#f0f6ff; border:1px solid #4A90D9; border-radius:6px; cursor:pointer; font-family:inherit; color:#4A90D9; white-space:nowrap;">📂 불러오기</button>
+    </div>
+    <div style="display:flex; flex-direction:column; align-items:flex-end; gap:5px;">
+      <button onclick="togglePanel()" id="toggleBtn" style="padding:4px 10px; font-size:11px; background:#f0f0f0; border:1px solid #ddd; border-radius:6px; cursor:pointer; font-family:inherit; color:#555; white-space:nowrap;">◀ 접기</button>
+      <button onclick="saveQuote()" style="padding:4px 10px; font-size:11px; font-weight:700; background:#1a1a2e; border:none; border-radius:6px; cursor:pointer; font-family:inherit; color:#fff; white-space:nowrap;">💾 저장</button>
+    </div>
   </div>
   <p class="subtitle">변수를 입력하면 자동으로 견적서가 완성됩니다</p>
 
@@ -791,17 +797,13 @@ body { font-family: 'Malgun Gothic', sans-serif; background: #f0f2f5; min-height
     </div>
   </div>
 
-  <!-- 저장/불러오기 -->
-  <div class="save-section">
+  <!-- 불러오기 패널 (기본 숨김) -->
+  <div class="save-section" id="loadPanel" style="display:none;">
     <div class="save-header" onclick="toggleSaveSection()">
-      <span class="save-header-title">💾 저장 / 불러오기</span>
-      <span class="save-header-toggle" id="saveToggleIcon">▼ 열기</span>
+      <span class="save-header-title">📂 불러오기</span>
+      <span class="save-header-toggle" id="saveToggleIcon">▲ 닫기</span>
     </div>
-    <div class="save-body" id="saveBody">
-      <div class="save-input-row">
-        <input type="text" id="saveTitle" placeholder="저장 이름 (비우면 수신처_현장명 자동입력)" />
-        <button class="save-btn" onclick="saveQuote()">저장</button>
-      </div>
+    <div class="save-body open" id="saveBody">
       <div class="saved-list" id="savedList"></div>
     </div>
   </div>
@@ -1405,12 +1407,28 @@ function downloadJPG() {
 var SAVE_KEY = 'dian_quotes';
 
 function toggleSaveSection() {
-  var body = document.getElementById('saveBody');
-  var icon = document.getElementById('saveToggleIcon');
-  var isOpen = body.classList.contains('open');
-  body.classList.toggle('open');
-  icon.textContent = isOpen ? '▼ 열기' : '▲ 닫기';
-  if (!isOpen) renderSavedList();
+  var panel = document.getElementById('loadPanel');
+  panel.style.display = 'none';
+}
+
+function openLoadPanel() {
+  var panel = document.getElementById('loadPanel');
+  panel.style.display = 'block';
+  renderSavedList();
+  panel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
+
+function showToast(msg) {
+  var t = document.getElementById('toast');
+  if (!t) {
+    t = document.createElement('div');
+    t.id = 'toast';
+    t.style.cssText = 'position:fixed;bottom:30px;left:50%;transform:translateX(-50%);background:#1a1a2e;color:#fff;padding:10px 22px;border-radius:20px;font-size:13px;font-weight:600;z-index:9999;opacity:0;transition:opacity 0.3s;pointer-events:none;';
+    document.body.appendChild(t);
+  }
+  t.textContent = msg;
+  t.style.opacity = '1';
+  setTimeout(function(){ t.style.opacity = '0'; }, 2000);
 }
 
 function getSavedQuotes() {
@@ -1421,8 +1439,7 @@ function getSavedQuotes() {
 function saveQuote() {
   var client  = document.getElementById('clientName').value.trim() || '(수신처 없음)';
   var site    = document.getElementById('siteName').value.trim();
-  var titleInput = document.getElementById('saveTitle').value.trim();
-  var title = titleInput || (client + (site ? '_' + site : ''));
+  var title = client + (site ? '_' + site : '');
   var now = new Date();
   var dateStr = now.getFullYear() + '-' + (now.getMonth()+1) + '-' + now.getDate()
               + ' ' + now.getHours() + ':' + String(now.getMinutes()).padStart(2,'0');
@@ -1464,7 +1481,7 @@ function saveQuote() {
   localStorage.setItem(SAVE_KEY, JSON.stringify(quotes));
   document.getElementById('saveTitle').value = '';
   renderSavedList();
-  alert('저장됐어요! 📁');
+  showToast('저장됐어요! 📁');
 }
 
 function loadQuote(id) {
@@ -1507,7 +1524,7 @@ function loadQuote(id) {
     if (inputs[6]) inputs[6].value = item.remark|| '';
   });
   calcTotal();
-  alert('불러왔어요! ✅');
+  showToast('불러왔어요! ✅');
 }
 
 function deleteSaved(id) {
