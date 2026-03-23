@@ -321,16 +321,6 @@ body { font-family: 'Malgun Gothic', sans-serif; background: #f0f2f5; min-height
 
   <div class="section">
     <div class="section-title">📦 납품 정보</div>
-    <div class="field-row">
-      <div class="field">
-        <label>납품장소</label>
-        <input type="text" id="deliveryPlace" placeholder="납품장소" />
-      </div>
-      <div class="field">
-        <label>현장담당자</label>
-        <input type="text" id="siteManager" placeholder="현장담당자" />
-      </div>
-    </div>
     <div class="field">
       <label>현장명</label>
       <input type="text" id="siteName" placeholder="현장명" />
@@ -451,8 +441,11 @@ function loadFabricData() {
             var spec  = (row[3] || '').toString().trim();
             var alias = (row[5] || '').trim();
             if (name) {
-              var entry = { name: name, price: price, spec: spec ? spec + 'mm' : '1400mm' };
+              var specVal = spec ? spec + 'mm' : '1400mm';
+              // 영문명으로 저장 (searchKey = 실제 검색어, name = 표시명)
+              var entry = { name: name, price: price, spec: specVal, alias: alias };
               _fabricData[name.toUpperCase()] = entry;
+              // 한글 보조명도 별도 키로 저장 (표시는 영문명으로)
               if (alias) _fabricData[alias.toUpperCase()] = entry;
             }
           });
@@ -488,9 +481,13 @@ function onItemInput(input) {
     var kwUpper = keyword.toUpperCase();
     var seen = {}, unique = [];
     Object.values(data).forEach(function(item){
-      if (!seen[item.name] && item.name.toUpperCase().includes(kwUpper)) {
-        seen[item.name] = 1;
-        unique.push(item);
+      if (!seen[item.name]) {
+        var nameMatch  = item.name.toUpperCase().includes(kwUpper);
+        var aliasMatch = item.alias && item.alias.toUpperCase().includes(kwUpper);
+        if (nameMatch || aliasMatch) {
+          seen[item.name] = 1;
+          unique.push(item);
+        }
       }
     });
     unique = unique.slice(0, 10);
@@ -502,7 +499,8 @@ function onItemInput(input) {
     dropdown.innerHTML = '';
     unique.forEach(function(item){
       var div = document.createElement('div');
-      div.innerHTML = '<span class="ac-name">' + item.name + '</span>' +
+      var aliasLabel = item.alias ? ' (' + item.alias + ')' : '';
+      div.innerHTML = '<span class="ac-name">' + item.name + aliasLabel + '</span>' +
                       '<span class="ac-info">' + item.spec + ' &nbsp;|&nbsp; ' + parseInt(item.price || 0).toLocaleString() + '원/Y</span>';
       div.onmousedown = function(e){
         e.preventDefault();
@@ -631,8 +629,8 @@ function generatePreview() {
   var clientName    = document.getElementById('clientName').value || '';
   var attn          = document.getElementById('attn').value || '';
   var clientTel     = document.getElementById('clientTel').value || '';
-  var deliveryPlace = document.getElementById('deliveryPlace').value || '';
-  var siteManager   = document.getElementById('siteManager').value || '';
+  var deliveryPlace = '';
+  var siteManager   = '';
   var siteName      = document.getElementById('siteName').value || '';
   var remark        = document.getElementById('remark').value || '';
 
