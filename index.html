@@ -417,6 +417,93 @@ body { font-family: 'Malgun Gothic', sans-serif; background: #f0f2f5; min-height
   .qp-client { font-size: 16px; }
   .qp-table th, .qp-table td { padding: 6px 4px; font-size: 10px; }
 }
+
+/* ── 모바일 반응형 ── */
+@media (max-width: 768px) {
+  .app-container { flex-direction: column; }
+
+  .form-panel {
+    width: 100% !important; min-width: unset !important;
+    padding: 20px 16px 40px; border-right: none;
+    border-bottom: 1px solid #e0e0e0;
+  }
+
+  .preview-panel { padding: 20px 12px; }
+
+  /* 품목 헤더 숨기고 각 행을 카드형으로 */
+  .items-header { display: none !important; }
+
+  .item-row {
+    display: flex !important;
+    flex-wrap: wrap;
+    gap: 6px;
+    padding: 10px 10px 10px 8px;
+    border-radius: 10px;
+    margin-bottom: 10px;
+  }
+
+  /* NO 번호 */
+  .item-row .item-num {
+    width: 22px; height: 22px; flex-shrink: 0;
+    align-self: center;
+  }
+
+  /* 원단명 wrap - 전체 너비 */
+  .item-row .autocomplete-wrap {
+    flex: 1 1 calc(100% - 32px);
+    min-width: 0;
+  }
+
+  /* 색상 */
+  .item-row input:nth-of-type(1) { flex: 1 1 40%; min-width: 80px; }
+
+  /* 규격 */
+  .item-row input:nth-of-type(2) { flex: 1 1 25%; min-width: 70px; }
+
+  /* 수량 */
+  .item-row input:nth-of-type(3) { flex: 1 1 18%; min-width: 50px; }
+
+  /* 단위 */
+  .item-row input:nth-of-type(4) { flex: 0 0 40px; }
+
+  /* 단가 */
+  .item-row input:nth-of-type(5) { flex: 1 1 30%; min-width: 80px; }
+
+  /* 비고 */
+  .item-row input:nth-of-type(6) { flex: 1 1 40%; min-width: 80px; }
+
+  /* 삭제 버튼 */
+  .item-row .del-btn { align-self: center; flex-shrink: 0; }
+
+  /* 각 입력칸에 라벨 효과 (placeholder로 대체되어 있으므로 폰트만 조정) */
+  .item-row input { font-size: 13px; padding: 7px 8px; }
+
+  /* 담당자 그리드 */
+  .staff-grid { grid-template-columns: 1fr 1fr; }
+
+  /* 미리보기 견적서 스케일 축소 */
+  .qp {
+    width: 100% !important;
+    padding: 24px 20px;
+    font-size: 11px;
+  }
+  .qp-title { font-size: 16px; letter-spacing: 4px; }
+  .qp-logo-img { height: 40px; }
+  .qp-client { font-size: 15px; }
+  .qp-table th, .qp-table td { font-size: 10px; padding: 6px 3px; }
+  .qp-inforow { grid-template-columns: 1fr; }
+  .qp-infobox { border-right: none; border-bottom: 1px solid #eee; }
+
+  /* 다운로드 버튼 */
+  .download-btns { flex-direction: column; }
+
+  /* 단수정리 버튼 */
+  .rounding-btns { gap: 4px; }
+  .r-btn { font-size: 11px; padding: 5px 10px; }
+
+  /* field-row 모바일에서 세로 */
+  .field-row { flex-direction: column; }
+}
 </style>
 </head>
 <body>
@@ -465,9 +552,9 @@ body { font-family: 'Malgun Gothic', sans-serif; background: #f0f2f5; min-height
         <span class="sname">전새로미 사원</span>
         <span class="srole">010-4383-2115</span>
       </button>
-      <button type="button" class="staff-btn" id="customStaffBtn" onclick="selectStaff('','','',this)" style="grid-column:1/-1;">
+      <button type="button" class="staff-btn" id="customStaffBtn" onclick="selectStaff('','','',this)">
         <span class="sname">기타 (직접 입력)</span>
-        <span class="srole">이름 · 직책 · 연락처 직접 입력</span>
+        <span class="srole">이름 · 직책 · 연락처 입력</span>
       </button>
     </div>
     <!-- 선택된 담당자 요약 (선택 후 표시) -->
