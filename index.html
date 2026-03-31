@@ -989,8 +989,8 @@ function renderList(){
         html+='<div class="sitem">';
         html+='<div class="sin"><div class="sn">'+q.title+'</div><div class="sd">'+q.savedAt+'</div></div>';
         html+='<div class="sibtns">';
-        html+='<button class="lbtn" onclick="loadQuote('+q.id+')">불러오기</button>';
-        html+='<button class="dsbtn" onclick="delSaved('+q.id+')">삭제</button>';
+        html+='<button class="lbtn" data-id="'+q.id+'">불러오기</button>';
+        html+='<button class="dsbtn" data-id="'+q.id+'">삭제</button>';
         html+='</div></div>';
       });
       html+='</div>';
@@ -1105,18 +1105,22 @@ function renderDriveList(){
   Object.keys(sg).forEach(function(st,si){
     var gid='dg'+si;
     html+='<div class="lgroup">';
-    html+='<div class="lghead" onclick="togGrp(''+gid+'')"><span>'+st+'</span><span>'+sg[st].length+'건 <span id="'+gid+'_i">▼</span></span></div>';
+    html+='<div class="lghead" onclick="togGrp(\''+gid+'\')"><span>'+st+'</span><span>'+sg[st].length+'건 <span id="'+gid+'_i">▼</span></span></div>';
     html+='<div class="lgbody" id="'+gid+'">';
     sg[st].forEach(function(f){
       var dt=f.modified?f.modified.substring(0,10):'';
       html+='<div class="gdrive-file">';
       html+='<div><div class="gfn">'+f.name.replace('.json','')+'</div><div class="gfd">'+dt+'</div></div>';
-      html+='<button class="gdrive-load-btn" onclick="loadDriveFile(''+f.id+'')">불러오기</button>';
+    html+='<button class="gdrive-load-btn" onclick="loadDriveFile(\''+f.id+'\')">불러오기</button>';
       html+='</div>';
     });
     html+='</div></div>';
   });
   list.innerHTML=html;
+  // 이벤트 등록
+  list.querySelectorAll('.gdrive-load-btn').forEach(function(btn){
+    btn.addEventListener('click', function(){ loadDriveFile(this.getAttribute('data-fid')); });
+  });
 }
 
 function filterDriveList(){renderDriveList();}
@@ -1183,6 +1187,11 @@ window.addEventListener('DOMContentLoaded',function(){
   document.getElementById('remark').value='부가세 포함 금액입니다.\n커팅 해 출고 된 원단은 반품이 불가합니다.\n발주 후 2~3일 후 출고 됩니다.';
   document.querySelector('.sb').classList.add('act');
   addItem(); addItem(); addItem();
+  // items 컨테이너 이벤트 위임
+  document.getElementById('items').addEventListener('click', function(e){
+    var delbtn = e.target.closest('.delbtn');
+    if(delbtn) delItem(delbtn.getAttribute('data-id'));
+  });
   loadFabric();
 });
 
