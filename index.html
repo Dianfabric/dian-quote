@@ -321,7 +321,8 @@ var LOGO = 'data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/4gHYSUNDX1BST0ZJT
 
 var SHEET_ID = '1oyIwn0jsUgvlmDr53jNKkFGHuj_W6zFcFKPgfncQ3PA';
 var GDRIVE_CLIENT_ID = '20735420913-sk48c5qk3oj415sbugqnauigcdqht6m7.apps.googleusercontent.com';
-var GDRIVE_SCOPE = 'https://www.googleapis.com/auth/drive.file';
+var GDRIVE_SCOPE = 'https://www.googleapis.com/auth/drive';
+var DIAN_FOLDER_ID = '0B-R97A3O4222TzFDUnROV2YtYXM';
 var _gToken = null;
 
 // 구글 드라이브 로그인
@@ -350,19 +351,19 @@ function gdriveLogin() {
   client.requestAccessToken();
 }
 
-// 폴더 찾기 또는 생성
+// 폴더 찾기 또는 생성 (공유드라이브 지원)
 async function gdriveGetFolder(folderName, parentId) {
-  // 검색
-  var q = "name='" + folderName + "' and mimeType='application/vnd.google-apps.folder' and trashed=false" + (parentId ? " and '" + parentId + "' in parents" : '');
-  var res = await fetch('https://www.googleapis.com/drive/v3/files?q=' + encodeURIComponent(q) + '&fields=files(id,name)', {
-    headers: { Authorization: 'Bearer ' + _gToken }
-  });
+  var q = "name='" + folderName + "' and mimeType='application/vnd.google-apps.folder' and trashed=false and '" + parentId + "' in parents";
+  var res = await fetch(
+    'https://www.googleapis.com/drive/v3/files?q=' + encodeURIComponent(q) +
+    '&fields=files(id,name)&includeItemsFromAllDrives=true&supportsAllDrives=true',
+    { headers: { Authorization: 'Bearer ' + _gToken } }
+  );
   var data = await res.json();
   if (data.files && data.files.length > 0) return data.files[0].id;
   // 없으면 생성
-  var meta = { name: folderName, mimeType: 'application/vnd.google-apps.folder' };
-  if (parentId) meta.parents = [parentId];
-  var cr = await fetch('https://www.googleapis.com/drive/v3/files', {
+  var meta = { name: folderName, mimeType: 'application/vnd.google-apps.folder', parents: [parentId] };
+  var cr = await fetch('https://www.googleapis.com/drive/v3/files?supportsAllDrives=true', {
     method: 'POST',
     headers: { Authorization: 'Bearer ' + _gToken, 'Content-Type': 'application/json' },
     body: JSON.stringify(meta)
@@ -373,24 +374,24 @@ async function gdriveGetFolder(folderName, parentId) {
 
 // 드라이브에 파일 업로드
 async function gdriveSaveFile(blob, fileName, mimeType) {
-  if (!_gToken) return; // 로그인 안 됨
+  if (!_gToken) return;
   try {
-    // DiAN 견적서 폴더 → 담당자 폴더
-    var rootId = await gdriveGetFolder('DiAN 견적서', null);
+    // [디안]업무문서 폴더 내 담당자 폴더 찾거나 생성
     var staffName = (_sN + ' ' + _sR).trim() || '미지정';
-    var staffId = await gdriveGetFolder(staffName, rootId);
-    // 파일 업로드 (multipart)
+    var staffId = await gdriveGetFolder(staffName, DIAN_FOLDER_ID);
+    // 파일 업로드
     var meta = JSON.stringify({ name: fileName, parents: [staffId] });
     var form = new FormData();
     form.append('metadata', new Blob([meta], {type:'application/json'}));
     form.append('file', blob);
-    var res = await fetch('https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart', {
+    var res = await fetch('https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart&supportsAllDrives=true', {
       method: 'POST',
       headers: { Authorization: 'Bearer ' + _gToken },
       body: form
     });
+    var data = await res.json();
     if (res.ok) toast('드라이브에 저장됐어요! ☁️');
-    else toast('드라이브 저장 실패 😢');
+    else { console.error(data); toast('드라이브 저장 실패: ' + (data.error&&data.error.message||'')); }
   } catch(e) {
     console.error(e); toast('드라이브 오류: ' + e.message);
   }
