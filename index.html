@@ -376,9 +376,10 @@ async function gdriveGetFolder(folderName, parentId) {
 async function gdriveSaveFile(blob, fileName, mimeType) {
   if (!_gToken) return;
   try {
-    // [디안]업무문서 폴더 내 담당자 폴더 찾거나 생성
+    // [디안]업무문서 → 견적서 모음 → 담당자 폴더 → 파일
+    var quoteFolder = await gdriveGetFolder('견적서 모음', DIAN_FOLDER_ID);
     var staffName = (_sN + ' ' + _sR).trim() || '미지정';
-    var staffId = await gdriveGetFolder(staffName, DIAN_FOLDER_ID);
+    var staffId = await gdriveGetFolder(staffName, quoteFolder);
     // 파일 업로드
     var meta = JSON.stringify({ name: fileName, parents: [staffId] });
     var form = new FormData();
