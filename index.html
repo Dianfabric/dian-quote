@@ -403,11 +403,12 @@ async function gdriveGetFolder(folderName, parentId) {
 async function gdriveSaveFile(blob, fileName, mimeType) {
   if (!_gToken) return;
   try {
-    // [디안]업무문서 → 견적서 모음 → 담당자 폴더 → 파일
     var quoteFolder = await gdriveGetFolder('견적서 모음', DIAN_FOLDER_ID);
     var staffName = (_sN + ' ' + _sR).trim() || '미지정';
-    var staffId = await gdriveGetFolder(staffName, quoteFolder);
-    // 파일 업로드
+    // PDF/JPG는 "(PDF,JPG)" 폴더, JSON은 "(JSON)" 폴더
+    var isJson = mimeType === 'application/json';
+    var folderName = staffName + (isJson ? ' (JSON)' : ' (PDF,JPG)');
+    var staffId = await gdriveGetFolder(folderName, quoteFolder);
     var meta = JSON.stringify({ name: fileName, parents: [staffId] });
     var form = new FormData();
     form.append('metadata', new Blob([meta], {type:'application/json'}));
@@ -1068,12 +1069,15 @@ async function loadDriveList(){
     var q = "mimeType='application/json' and trashed=false and '"+quoteFolderId+"' in parents";
     // 담당자 폴더들 먼저 가져오기
     var fRes = await fetch(
-      'https://www.googleapis.com/drive/v3/files?q='+encodeURIComponent("mimeType='application/vnd.google-apps.folder' and '"+quoteFolderId+"' in parents and trashed=false")+
+      'https://www.googleapis.com/drive/v3/files?q='+encodeURIComponent("mimeType='application/vnd.google-apps.folder' and name contains '(JSON)' and '"+quoteFolderId+"' in parents and trashed=false")+
       '&fields=files(id,name)&supportsAllDrives=true&includeItemsFromAllDrives=true',
       {headers:{Authorization:'Bearer '+_gToken}}
     );
     var fData = await fRes.json();
-    var staffFolders = fData.files||[];
+    // 폴더명에서 " (JSON)" 제거해서 담당자명으로 표시
+    var staffFolders = (fData.files||[]).map(function(f){
+      return {id: f.id, name: f.name.replace(' (JSON)', '')};
+    });
     _driveFiles = [];
     // 각 담당자 폴더에서 JSON 파일 목록
     for(var i=0;i<staffFolders.length;i++){
