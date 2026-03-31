@@ -161,19 +161,22 @@ body{font-family:'Malgun Gothic',sans-serif;background:#f0f2f5;min-height:100vh}
   .frow{flex-direction:column}
   .sg{grid-template-columns:1fr 1fr}
   .ih{display:none!important}
-  .ir{display:grid!important;grid-template-columns:22px 1fr 22px;grid-template-rows:auto auto auto auto;gap:5px;padding:10px 8px;border-radius:10px;margin-bottom:10px;border:1px solid #e8e8e8;background:#fafafa}
-  .ir .inum{grid-row:1;grid-column:1;align-self:center}
-  .ir .acw{grid-row:1;grid-column:2;width:100%}
-  .ir .acw input{width:100%;font-size:14px;padding:8px 10px}
-  .ir .delbtn{grid-row:1;grid-column:3;align-self:center}
-  .ir>input{grid-row:2;font-size:12px;padding:6px 8px}
-  .ir>input:nth-of-type(1){grid-column:1/4}
-  .ir{grid-template-rows:auto auto auto auto auto}
-  .ir>input:nth-of-type(3){grid-row:4;grid-column:1/2}
-  .ir>input:nth-of-type(4){grid-row:4;grid-column:2/3}
-  .ir>input:nth-of-type(5){grid-row:5;grid-column:1/2}
-  .ir>input:nth-of-type(6){grid-row:5;grid-column:2/3}
-  .ir>input:nth-of-type(7){grid-row:6;grid-column:1/4}
+  .ih{display:none!important}
+  .ir{display:block!important;padding:10px 10px;border-radius:10px;margin-bottom:12px;border:1px solid #e0e0e0;background:#fafafa}
+  /* 1줄: 번호 + 원단명 + 삭제 */
+  .ir-row1{display:grid;grid-template-columns:22px 1fr 26px;gap:6px;align-items:center;margin-bottom:8px}
+  .ir-row1 .inum{width:22px;height:22px;background:#e8ecf0;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#666}
+  .ir-row1 .acw{width:100%}
+  .ir-row1 .acw input{width:100%;font-size:14px;padding:8px 10px;border:1px solid #e0e0e0;border-radius:5px;font-family:inherit;background:#fff}
+  /* 2줄: 색상 | 규격 | 수량 | 단위 (3:2:1:1 비율) */
+  .ir-row2{display:grid;grid-template-columns:3fr 2fr 1.5fr 1fr;gap:5px;margin-bottom:6px}
+  /* 3줄: 단가 | 비고 (1:2 비율) */
+  .ir-row3{display:grid;grid-template-columns:1fr 2fr;gap:5px}
+  .ir-row2 input,.ir-row3 input{width:100%;padding:7px 8px;border:1px solid #e0e0e0;border-radius:5px;font-size:13px;font-family:inherit;background:#fff;text-align:center}
+  .ir-row2 input:first-child{text-align:left}
+  .ir-row3 input:last-child{text-align:left}
+  .ir-lbl{font-size:9px;color:#aaa;text-align:center;margin-bottom:2px}
+  .ir-lbl-l{font-size:9px;color:#aaa;text-align:left;margin-bottom:2px}
   #previewArea{width:100%;overflow-x:auto}
   .qp{width:794px!important;min-width:794px}
   .dlbtns{flex-direction:column}
@@ -417,6 +420,7 @@ function calcTot(){
   var sub=0;
   document.querySelectorAll('.ir').forEach(function(r){
     var inp=r.querySelectorAll('input');
+    // inp[3]=수량, inp[5]=단가 (PC), 모바일도 동일 순서
     sub+=(parseFloat(inp[3].value)||0)*(parseFloat(inp[5].value)||0);
   });
   var raw=sub+Math.round(sub*.1);
@@ -743,8 +747,13 @@ function loadQuote(id){
     addItem();
     var r=cont.lastElementChild;
     var inp=r.querySelectorAll('input');
-    inp[0].value=it.name||''; inp[1].value=it.color||''; inp[2].value=it.spec||'';
-    inp[3].value=it.qty||''; inp[4].value=it.unit||''; inp[5].value=it.price||''; inp[6].value=it.remark||'';
+    if(inp[0]) inp[0].value=it.name||'';
+    if(inp[1]) inp[1].value=it.color||'';
+    if(inp[2]) inp[2].value=it.spec||'';
+    if(inp[3]) inp[3].value=it.qty||'';
+    if(inp[4]) inp[4].value=it.unit||'';
+    if(inp[5]) inp[5].value=it.price||'';
+    if(inp[6]) inp[6].value=it.remark||'';
   });
   calcTot(); closeLoad(); toast('불러왔어요! ✅');
 }
