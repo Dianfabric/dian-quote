@@ -149,6 +149,17 @@ body{font-family:'Malgun Gothic',sans-serif;background:#f0f2f5;min-height:100vh}
 .dsbtn{padding:4px 8px;font-size:11px;background:#fff5f5;border:1px solid #fca5a5;border-radius:4px;color:#dc2626;cursor:pointer;font-family:inherit}
 .dsbtn:hover{background:#dc2626;color:#fff}
 .sempty{text-align:center;color:#bbb;font-size:12px;padding:20px 0}
+.ltabs{display:flex;border-bottom:2px solid #eee;margin-bottom:12px}
+.ltab{flex:1;padding:9px;text-align:center;font-size:13px;font-weight:600;color:#999;cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-2px;transition:all .2s}
+.ltab.act{color:#1a1a2e;border-bottom-color:#1a1a2e}
+.ltab-body{display:none}
+.ltab-body.act{display:block}
+.gdrive-file{display:flex;justify-content:space-between;align-items:center;padding:8px 12px;border:1px solid #eee;border-radius:6px;margin-bottom:6px;cursor:pointer;transition:all .15s}
+.gdrive-file:hover{background:#f0f6ff;border-color:#4A90D9}
+.gdrive-file .gfn{font-size:12px;font-weight:600;color:#222;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:240px}
+.gdrive-file .gfd{font-size:10px;color:#aaa;margin-top:2px}
+.gdrive-load-btn{padding:4px 10px;font-size:11px;background:#f0f6ff;border:1px solid #4A90D9;border-radius:4px;color:#4A90D9;cursor:pointer;font-family:inherit;flex-shrink:0}
+.gdrive-load-btn:hover{background:#4A90D9;color:#fff}
 
 /* 토스트 */
 #toast{position:fixed;bottom:30px;left:50%;transform:translateX(-50%);background:#1a1a2e;color:#fff;padding:10px 22px;border-radius:20px;font-size:13px;font-weight:600;z-index:9999;opacity:0;transition:opacity .3s;pointer-events:none}
@@ -166,21 +177,21 @@ body{font-family:'Malgun Gothic',sans-serif;background:#f0f2f5;min-height:100vh}
   .sg{grid-template-columns:1fr 1fr}
   .ih{display:none!important}
   .ih{display:none!important}
-  .ir{display:block!important;padding:10px 10px;border-radius:10px;margin-bottom:12px;border:1px solid #e0e0e0;background:#fafafa}
-  /* 1줄: 번호 + 원단명 + 삭제 */
-  .ir-row1{display:grid;grid-template-columns:22px 1fr 26px;gap:6px;align-items:center;margin-bottom:8px}
-  .ir-row1 .inum{width:22px;height:22px;background:#e8ecf0;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#666}
-  .ir-row1 .acw{width:100%}
-  .ir-row1 .acw input{width:100%;font-size:14px;padding:8px 10px;border:1px solid #e0e0e0;border-radius:5px;font-family:inherit;background:#fff}
-  /* 2줄: 색상 | 규격 | 수량 | 단위 (3:2:1:1 비율) */
-  .ir-row2{display:grid;grid-template-columns:3fr 2fr 1.5fr 1fr;gap:5px;margin-bottom:6px}
-  /* 3줄: 단가 | 비고 (1:2 비율) */
-  .ir-row3{display:grid;grid-template-columns:1fr 2fr;gap:5px}
-  .ir-row2 input,.ir-row3 input{width:100%;padding:7px 8px;border:1px solid #e0e0e0;border-radius:5px;font-size:13px;font-family:inherit;background:#fff;text-align:center}
-  .ir-row2 input:first-child{text-align:left}
-  .ir-row3 input:last-child{text-align:left}
-  .ir-lbl{font-size:9px;color:#aaa;text-align:center;margin-bottom:2px}
-  .ir-lbl-l{font-size:9px;color:#aaa;text-align:left;margin-bottom:2px}
+  .ir{display:block!important;padding:12px;border-radius:12px;margin-bottom:12px;border:1px solid #e0e0e0;background:#fff}
+  /* 1줄: 번호 + 원단명(크게) + 삭제 */
+  .ir-row1{display:flex;align-items:center;gap:8px;margin-bottom:10px}
+  .ir-row1 .inum{width:24px;height:24px;background:#e8ecf0;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#666;flex-shrink:0}
+  .ir-row1 .acw{flex:1}
+  .ir-row1 .acw input{width:100%;font-size:14px;padding:9px 10px;border:1px solid #e0e0e0;border-radius:6px;font-family:inherit;background:#fafafa}
+  /* 구분선 */
+  .ir-sep{border:none;border-top:1px solid #f0f0f0;margin:0 0 8px}
+  /* 2x2 그리드: 색상|규격 / 수량|단위 */
+  .ir-row2{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-bottom:7px}
+  /* 2x2 그리드: 단가|비고 */
+  .ir-row3{display:grid;grid-template-columns:1fr 1fr;gap:7px}
+  .ir-row2>div,.ir-row3>div{display:flex;flex-direction:column}
+  .ir-row2 input,.ir-row3 input{width:100%;padding:8px 10px;border:1px solid #e0e0e0;border-radius:6px;font-size:13px;font-family:inherit;background:#fafafa;box-sizing:border-box}
+  .ir-lbl{font-size:10px;color:#aaa;margin-bottom:3px}
   #previewArea{width:100%;overflow-x:auto}
   .qp{width:794px!important;min-width:794px}
   .dlbtns{flex-direction:column}
@@ -308,8 +319,24 @@ body{font-family:'Malgun Gothic',sans-serif;background:#f0f2f5;min-height:100vh}
     <button onclick="closeLoad()">✕</button>
   </div>
   <div class="lovbody">
-    <input class="lsearch" id="lsearch" type="text" placeholder="🔍 견적서 검색..." oninput="renderList()"/>
-    <div id="savedList"></div>
+    <!-- 탭 -->
+    <div class="ltabs">
+      <div class="ltab act" id="tab-local" onclick="switchTab('local')">💾 로컬 저장</div>
+      <div class="ltab" id="tab-drive" onclick="switchTab('drive')">☁️ 구글 드라이브</div>
+    </div>
+    <!-- 로컬 탭 -->
+    <div class="ltab-body act" id="body-local">
+      <input class="lsearch" id="lsearch" type="text" placeholder="🔍 견적서 검색..." oninput="renderList()"/>
+      <div id="savedList"></div>
+    </div>
+    <!-- 드라이브 탭 -->
+    <div class="ltab-body" id="body-drive">
+      <div id="driveListWrap">
+        <div class="sempty" id="driveStatus">☁️ 드라이브 연동 버튼을 먼저 눌러주세요</div>
+        <input class="lsearch" id="dsearch" type="text" placeholder="🔍 파일 검색..." oninput="filterDriveList()" style="display:none"/>
+        <div id="driveList"></div>
+      </div>
+    </div>
   </div>
 </div>
 
@@ -742,7 +769,10 @@ function dlPDF(){
     }
     var pdfBlob = pdf.output('blob');
     pdf.save(getFileName()+'.pdf');
-    if (_gToken) gdriveSaveFile(pdfBlob, getFileName()+'.pdf', 'application/pdf');
+    if (_gToken){
+      gdriveSaveFile(pdfBlob, getFileName()+'.pdf', 'application/pdf');
+      gdriveSaveJSON();
+    }
     btn.disabled=false; btn.textContent='⬇ PDF 다운로드';
   }).catch(function(e){
     console.error(e);
@@ -764,12 +794,12 @@ function dlJPG(){
     a.href=jpgDataUrl;
     a.click();
     if (_gToken) {
-      // dataURL → Blob
       var byteStr = atob(jpgDataUrl.split(',')[1]);
       var arr = new Uint8Array(byteStr.length);
       for(var i=0;i<byteStr.length;i++) arr[i]=byteStr.charCodeAt(i);
       var jpgBlob = new Blob([arr], {type:'image/jpeg'});
       gdriveSaveFile(jpgBlob, getFileName()+'.jpg', 'image/jpeg');
+      gdriveSaveJSON();
     }
     btn.disabled=false; btn.textContent='⬇ JPG 다운로드';
   }).catch(function(e){
@@ -815,6 +845,28 @@ function saveQuote(silent){
 
 function autoSave(){
   if(document.getElementById('clientName').value.trim()) saveQuote(true);
+}
+
+// JSON 데이터 드라이브에 저장
+async function gdriveSaveJSON(){
+  if(!_gToken) return;
+  var items=[];
+  document.querySelectorAll('.ir').forEach(function(r){
+    var inp=r.querySelectorAll('input');
+    items.push({name:inp[0]?inp[0].value:'',color:inp[1]?inp[1].value:'',spec:inp[2]?inp[2].value:'',
+      qty:inp[3]?inp[3].value:'',unit:inp[4]?inp[4].value:'',price:inp[5]?inp[5].value:'',remark:inp[6]?inp[6].value:''});
+  });
+  var qData={
+    quoteDate:document.getElementById('quoteDate').value,
+    clientName:document.getElementById('clientName').value,
+    attn:document.getElementById('attn').value,
+    clientTel:document.getElementById('clientTel').value,
+    siteName:document.getElementById('siteName').value,
+    remark:document.getElementById('remark').value,
+    rMode:_rMode, items:items
+  };
+  var jsonBlob=new Blob([JSON.stringify({data:qData},null,2)],{type:'application/json'});
+  await gdriveSaveFile(jsonBlob, getFileName()+'.json', 'application/json');
 }
 
 function loadQuote(id){
@@ -942,6 +994,138 @@ function openLoad(){
 function closeLoad(){
   document.getElementById('lovPanel').classList.remove('open');
   document.getElementById('lovbg').classList.remove('open');
+}
+
+// 탭 전환
+function switchTab(tab){
+  document.querySelectorAll('.ltab').forEach(function(t){t.classList.remove('act');});
+  document.querySelectorAll('.ltab-body').forEach(function(t){t.classList.remove('act');});
+  document.getElementById('tab-'+tab).classList.add('act');
+  document.getElementById('body-'+tab).classList.add('act');
+  if(tab==='drive') loadDriveList();
+}
+
+// 드라이브 JSON 목록 불러오기
+var _driveFiles = [];
+async function loadDriveList(){
+  var status = document.getElementById('driveStatus');
+  var list = document.getElementById('driveList');
+  var search = document.getElementById('dsearch');
+  if(!_gToken){
+    status.style.display='block';
+    status.textContent='☁️ 드라이브 연동 버튼을 먼저 눌러주세요';
+    list.innerHTML=''; search.style.display='none';
+    return;
+  }
+  status.style.display='block';
+  status.textContent='불러오는 중...';
+  list.innerHTML=''; search.style.display='none';
+  try{
+    // 견적서 모음 폴더 ID 찾기
+    var quoteFolderId = await gdriveGetFolder('견적서 모음', DIAN_FOLDER_ID);
+    // 전체 하위 JSON 파일 검색
+    var q = "mimeType='application/json' and trashed=false and '"+quoteFolderId+"' in parents";
+    // 담당자 폴더들 먼저 가져오기
+    var fRes = await fetch(
+      'https://www.googleapis.com/drive/v3/files?q='+encodeURIComponent("mimeType='application/vnd.google-apps.folder' and '"+quoteFolderId+"' in parents and trashed=false")+
+      '&fields=files(id,name)&supportsAllDrives=true&includeItemsFromAllDrives=true',
+      {headers:{Authorization:'Bearer '+_gToken}}
+    );
+    var fData = await fRes.json();
+    var staffFolders = fData.files||[];
+    _driveFiles = [];
+    // 각 담당자 폴더에서 JSON 파일 목록
+    for(var i=0;i<staffFolders.length;i++){
+      var sf = staffFolders[i];
+      var jRes = await fetch(
+        'https://www.googleapis.com/drive/v3/files?q='+encodeURIComponent("mimeType='application/json' and '"+sf.id+"' in parents and trashed=false")+
+        '&fields=files(id,name,modifiedTime)&orderBy=modifiedTime+desc&supportsAllDrives=true&includeItemsFromAllDrives=true',
+        {headers:{Authorization:'Bearer '+_gToken}}
+      );
+      var jData = await jRes.json();
+      (jData.files||[]).forEach(function(f){
+        _driveFiles.push({id:f.id, name:f.name, staff:sf.name, modified:f.modifiedTime});
+      });
+    }
+    _driveFiles.sort(function(a,b){return b.modified.localeCompare(a.modified);});
+    if(_driveFiles.length===0){
+      status.textContent='저장된 견적서 JSON이 없어요';
+      return;
+    }
+    status.style.display='none';
+    search.style.display='block';
+    renderDriveList();
+  }catch(e){
+    console.error(e);
+    status.textContent='오류: '+e.message;
+  }
+}
+
+function renderDriveList(){
+  var kw=(document.getElementById('dsearch').value||'').toUpperCase();
+  var list=document.getElementById('driveList');
+  var filtered=kw?_driveFiles.filter(function(f){return f.name.toUpperCase().includes(kw)||f.staff.toUpperCase().includes(kw);}):_driveFiles;
+  if(!filtered.length){list.innerHTML='<div class="sempty">검색 결과가 없어요</div>';return;}
+  // 담당자별 그룹
+  var sg={};
+  filtered.forEach(function(f){
+    if(!sg[f.staff]) sg[f.staff]=[];
+    sg[f.staff].push(f);
+  });
+  var html='';
+  Object.keys(sg).forEach(function(st,si){
+    var gid='dg'+si;
+    html+='<div class="lgroup">';
+    html+='<div class="lghead" onclick="togGrp(''+gid+'')"><span>'+st+'</span><span>'+sg[st].length+'건 <span id="'+gid+'_i">▼</span></span></div>';
+    html+='<div class="lgbody" id="'+gid+'">';
+    sg[st].forEach(function(f){
+      var dt=f.modified?f.modified.substring(0,10):'';
+      html+='<div class="gdrive-file">';
+      html+='<div><div class="gfn">'+f.name.replace('.json','')+'</div><div class="gfd">'+dt+'</div></div>';
+      html+='<button class="gdrive-load-btn" onclick="loadDriveFile(''+f.id+'')">불러오기</button>';
+      html+='</div>';
+    });
+    html+='</div></div>';
+  });
+  list.innerHTML=html;
+}
+
+function filterDriveList(){renderDriveList();}
+
+// 드라이브 JSON 파일 불러와서 폼에 적용
+async function loadDriveFile(fileId){
+  try{
+    var res=await fetch('https://www.googleapis.com/drive/v3/files/'+fileId+'?alt=media&supportsAllDrives=true',
+      {headers:{Authorization:'Bearer '+_gToken}});
+    var q=await res.json();
+    var d=q.data;
+    document.getElementById('quoteDate').value=d.quoteDate||'';
+    document.getElementById('clientName').value=d.clientName||'';
+    document.getElementById('attn').value=d.attn||'';
+    document.getElementById('clientTel').value=d.clientTel||'';
+    document.getElementById('siteName').value=d.siteName||'';
+    document.getElementById('remark').value=d.remark||'';
+    if(d.rMode){
+      _rMode=d.rMode;
+      document.querySelectorAll('.rbtn').forEach(function(b){b.classList.remove('act');});
+      var mmap={'none':'정리 없음','1000':'천원 단위','10000':'만원 단위','custom':'직접 입력'};
+      document.querySelectorAll('.rbtn').forEach(function(b){if(b.textContent.trim()===mmap[d.rMode])b.classList.add('act');});
+      document.getElementById('rcw').style.display=d.rMode==='custom'?'block':'none';
+    }
+    var cont=document.getElementById('items'); cont.innerHTML=''; _ic=0;
+    (d.items||[]).forEach(function(it){
+      addItem();
+      var r=cont.lastElementChild, inp=r.querySelectorAll('input');
+      if(inp[0]) inp[0].value=it.name||'';
+      if(inp[1]) inp[1].value=it.color||'';
+      if(inp[2]) inp[2].value=it.spec||'';
+      if(inp[3]) inp[3].value=it.qty||'';
+      if(inp[4]) inp[4].value=it.unit||'';
+      if(inp[5]) inp[5].value=it.price||'';
+      if(inp[6]) inp[6].value=it.remark||'';
+    });
+    calcTot(); closeLoad(); toast('드라이브에서 불러왔어요! ☁️');
+  }catch(e){console.error(e);toast('불러오기 실패: '+e.message);}
 }
 
 // 토스트
