@@ -971,7 +971,7 @@ function renderList(){
     var cnt=Object.values(sg[st]).reduce(function(s,m){return s+m.length;},0);
     // 담당자 그룹
     html+='<div class="lgroup">';
-    html+='<div class="lghead" onclick="togGrp(\''+gid+'\')">';
+    html+='<div class="lghead" data-gid="'+gid+'">';
     html+='<span>'+st+'</span><span>'+cnt+'건 <span id="'+gid+'_i">▼</span></span>';
     html+='</div>';
     html+='<div class="lgbody" id="'+gid+'">';
@@ -981,7 +981,7 @@ function renderList(){
       var parts=mk.split('-');
       var mlabel=parts[0]+'년 '+parseInt(parts[1])+'월';
       var items=sg[st][mk];
-      html+='<div class="mhead" onclick="togGrp(\''+mid+'\')">';
+    html+='<div class="mhead" data-gid="'+mid+'">';
       html+='<span>'+mlabel+'</span><span>'+items.length+'건 <span id="'+mid+'_i">▼</span></span>';
       html+='</div>';
       html+='<div class="mbody" id="'+mid+'">';
@@ -1105,7 +1105,7 @@ function renderDriveList(){
   Object.keys(sg).forEach(function(st,si){
     var gid='dg'+si;
     html+='<div class="lgroup">';
-    html+='<div class="lghead" onclick="togGrp(\''+gid+'\')"><span>'+st+'</span><span>'+sg[st].length+'건 <span id="'+gid+'_i">▼</span></span></div>';
+    html+='<div class="lghead" data-gid="'+gid+'"><span>'+st+'</span><span>'+sg[st].length+'건 <span id="'+gid+'_i">▼</span></span></div>';
     html+='<div class="lgbody" id="'+gid+'">';
     sg[st].forEach(function(f){
       var dt=f.modified?f.modified.substring(0,10):'';
