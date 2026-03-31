@@ -999,6 +999,18 @@ function renderList(){
   });
   cont.innerHTML=html;
 
+  // lghead/mhead 클릭 이벤트 등록
+  cont.querySelectorAll('.lghead,.mhead').forEach(function(el){
+    el.addEventListener('click', function(){ togGrp(this.getAttribute('data-gid')); });
+  });
+  // 불러오기/삭제 이벤트 등록
+  cont.querySelectorAll('.lbtn').forEach(function(btn){
+    btn.addEventListener('click', function(){ loadQuote(parseInt(this.getAttribute('data-id'))); });
+  });
+  cont.querySelectorAll('.dsbtn').forEach(function(btn){
+    btn.addEventListener('click', function(){ delSaved(parseInt(this.getAttribute('data-id'))); });
+  });
+
   // 검색 중이면 모두 펼치기
   if(kw){
     document.querySelectorAll('.lgbody,.mbody').forEach(function(el){el.style.display='block';});
@@ -1111,13 +1123,17 @@ function renderDriveList(){
       var dt=f.modified?f.modified.substring(0,10):'';
       html+='<div class="gdrive-file">';
       html+='<div><div class="gfn">'+f.name.replace('.json','')+'</div><div class="gfd">'+dt+'</div></div>';
-    html+='<button class="gdrive-load-btn" onclick="loadDriveFile(\''+f.id+'\')">불러오기</button>';
+    html+='<button class="gdrive-load-btn" data-fid="'+f.id+'">불러오기</button>';
       html+='</div>';
     });
     html+='</div></div>';
   });
   list.innerHTML=html;
-  // 이벤트 등록
+  // lghead 클릭 이벤트
+  list.querySelectorAll('.lghead').forEach(function(el){
+    el.addEventListener('click', function(){ togGrp(this.getAttribute('data-gid')); });
+  });
+  // 불러오기 버튼 이벤트
   list.querySelectorAll('.gdrive-load-btn').forEach(function(btn){
     btn.addEventListener('click', function(){ loadDriveFile(this.getAttribute('data-fid')); });
   });
