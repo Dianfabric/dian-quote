@@ -511,7 +511,7 @@ function addItem(){
           '<input type="text" class="l" placeholder="원단명 입력..." oninput="onAcInput(this)" onkeydown="onAcKey(this,event)" autocomplete="off"/>'+
           '<div class="acl"></div>'+
         '</div>'+
-        '<button class="delbtn" onclick="delItem(''+id+'')">×</button>'+
+        '<button class="delbtn" data-id="'+id+'">×</button>'+
       '</div>'+
       '<hr class="ir-sep"/>'+
       '<div class="ir-row2">'+
@@ -537,11 +537,16 @@ function addItem(){
       '<input type="text" placeholder="Y"/>'+
       '<input type="number" placeholder="단가" oninput="calcTot()"/>'+
       '<input type="text" class="l" placeholder="비고"/>'+
-      '<button class="delbtn" onclick="delItem(''+id+'')">×</button>';
+      '<button class="delbtn" data-id="'+id+'">×</button>';
   }
+  // 삭제 버튼 이벤트 data-id 방식으로 처리
+  div.querySelector('.delbtn').addEventListener('click', function(){
+    delItem(this.getAttribute('data-id'));
+  });
   cont.appendChild(div);
   calcTot();
 }
+
 function delItem(id){
   var el=document.getElementById(id);
   if(el) el.remove();
