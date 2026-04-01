@@ -607,8 +607,8 @@ function setRound(m,btn){
   calcTot();
 }
 function applyRound(g){
-  if(_rMode==='1000') return Math.round(g/1000)*1000;
-  if(_rMode==='10000') return Math.round(g/10000)*10000;
+  if(_rMode==='1000') return Math.floor(g/1000)*1000;
+  if(_rMode==='10000') return Math.floor(g/10000)*10000;
   if(_rMode==='custom'){
     var v=parseFloat(document.getElementById('rcInput').value);
     return isNaN(v)?g:v;
@@ -743,18 +743,17 @@ function genPreview(){
     return '<tr><td>'+r.no+'</td><td class="tl">'+r.item+'</td><td>'+r.spec+'</td><td>'+r.qty+'</td><td>'+r.unit+'</td><td>'+(r.price?r.price.toLocaleString():'')+'</td><td>'+(r.amount?r.amount.toLocaleString():'')+'</td><td class="tl">'+r.remark+'</td></tr>';
   }).join('');
 
-  // 단수정리 행 추가
+  // 단수정리 행 추가 (항상 내림)
   var raw = sub + vat;
   if(_rMode !== 'none' && grand !== raw){
-    var diff = grand - raw;
+    var diff = grand - raw; // 항상 음수 (내림)
     var adjNo = rows.length + 1;
-    // 조정금액을 단가로 표현
     trs += '<tr style="color:#888">';
     trs += '<td>'+adjNo+'</td>';
     trs += '<td class="tl">단수정리</td>';
     trs += '<td></td><td></td><td></td>';
-    trs += '<td>'+(diff>0?'+':'')+diff.toLocaleString()+'</td>';
-    trs += '<td>'+(diff>0?'+':'')+diff.toLocaleString()+'</td>';
+    trs += '<td>'+diff.toLocaleString()+'</td>';
+    trs += '<td>'+diff.toLocaleString()+'</td>';
     trs += '<td></td>';
     trs += '</tr>';
   }
