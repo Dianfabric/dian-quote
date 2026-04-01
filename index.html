@@ -582,16 +582,16 @@ function getRows(){
     var n=inp[0].value.trim();
     if(!n) return;
     var col=inp[1].value.trim();
-    var qty=parseFloat(inp[3].value)||0;
+    var qty=inp[3].value.trim()===''?'':parseFloat(inp[3].value)||0;
     var price=parseFloat(inp[5].value)||0;
     rows.push({
       no:no++,
       item:col?n+' '+col:n,
-      spec:inp[2].value.trim()||'1400mm',
+      spec:inp[2].value.trim(),
       qty:qty,
-      unit:inp[4].value.trim()||'Y',
+      unit:inp[4].value.trim(),
       price:price,
-      amount:qty*price,
+      amount:(parseFloat(inp[3].value)||0)*price,
       remark:inp[6].value.trim()
     });
   });
@@ -740,8 +740,24 @@ function genPreview(){
   var kor=numKor(grand);
 
   var trs=rows.map(function(r){
-    return '<tr><td>'+r.no+'</td><td class="tl">'+r.item+'</td><td>'+r.spec+'</td><td>'+r.qty+'</td><td>'+r.unit+'</td><td>'+r.price.toLocaleString()+'</td><td>'+r.amount.toLocaleString()+'</td><td class="tl">'+r.remark+'</td></tr>';
+    return '<tr><td>'+r.no+'</td><td class="tl">'+r.item+'</td><td>'+r.spec+'</td><td>'+r.qty+'</td><td>'+r.unit+'</td><td>'+(r.price?r.price.toLocaleString():'')+'</td><td>'+(r.amount?r.amount.toLocaleString():'')+'</td><td class="tl">'+r.remark+'</td></tr>';
   }).join('');
+
+  // 단수정리 행 추가
+  var raw = sub + vat;
+  if(_rMode !== 'none' && grand !== raw){
+    var diff = grand - raw;
+    var adjNo = rows.length + 1;
+    // 조정금액을 단가로 표현
+    trs += '<tr style="color:#888">';
+    trs += '<td>'+adjNo+'</td>';
+    trs += '<td class="tl">단수정리</td>';
+    trs += '<td></td><td></td><td></td>';
+    trs += '<td>'+(diff>0?'+':'')+diff.toLocaleString()+'</td>';
+    trs += '<td>'+(diff>0?'+':'')+diff.toLocaleString()+'</td>';
+    trs += '<td></td>';
+    trs += '</tr>';
+  }
 
   var rmhtml=rm
     ? rm.split('\n').map(function(l){return '<p>* '+l.replace(/^\*\s*/,'')+'</p>';}).join('')
