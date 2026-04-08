@@ -116,6 +116,8 @@ body{font-family:'Malgun Gothic',sans-serif;background:#f0f2f5;min-height:100vh}
 .dlbtn{flex:1;padding:12px 20px;border:none;border-radius:8px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;transition:all .2s}
 .dlbtn.pdf{background:#1a1a2e;color:#fff}
 .dlbtn.jpg{background:#fff;color:#1a1a2e;border:2px solid #1a1a2e}
+.dlbtn.copy{background:#f0f6ff;color:#4A90D9;border:2px solid #4A90D9}
+.dlbtn.copy:hover{background:#4A90D9;color:#fff;transform:translateY(-1px)}
 .dlbtn:hover{transform:translateY(-1px)}
 .dlbtn:disabled{opacity:.6;cursor:not-allowed;transform:none}
 
@@ -779,6 +781,7 @@ function genPreview(){
   html+='<div class="dlbtns">';
   html+='<button class="dlbtn pdf" id="pdfBtn" onclick="dlPDF()">⬇ PDF 다운로드</button>';
   html+='<button class="dlbtn jpg" id="jpgBtn" onclick="dlJPG()">⬇ JPG 다운로드</button>';
+  html+='<button class="dlbtn copy" id="copyBtn" onclick="dlCopy()">📋 복사</button>';
   html+='</div>';
 
   document.getElementById('previewArea').innerHTML='<div style="overflow-x:auto;-webkit-overflow-scrolling:touch">'+html+'</div>';
@@ -850,6 +853,44 @@ function dlJPG(){
   }).catch(function(e){
     console.error(e);
     btn.disabled=false; btn.textContent='⬇ JPG 다운로드';
+  });
+}
+
+// 복사 (클립보드)
+function dlCopy(){
+  var prev=document.getElementById('qPDF');
+  if(!prev) return;
+  autoSave();
+  var btn=document.getElementById('copyBtn');
+  btn.disabled=true; btn.textContent='복사 중...';
+  html2canvas(prev,{scale:2,useCORS:true,backgroundColor:'#ffffff'}).then(function(canvas){
+    canvas.toBlob(function(blob){
+      try{
+        var item = new ClipboardItem({'image/png': blob});
+        navigator.clipboard.write([item]).then(function(){
+          btn.disabled=false; btn.textContent='📋 복사';
+          toast('클립보드에 복사됐어요! 📋');
+        }).catch(function(e){
+          // 클립보드 API 실패시 대체: 이미지 새탭으로 열기
+          var url=URL.createObjectURL(blob);
+          var a=document.createElement('a');
+          a.href=url; a.download=getFileName()+'.png'; a.click();
+          btn.disabled=false; btn.textContent='📋 복사';
+          toast('브라우저 제한으로 다운로드로 대체됐어요');
+        });
+      }catch(e){
+        btn.disabled=false; btn.textContent='📋 복사';
+        toast('복사 실패: '+e.message);
+      }
+      // 드라이브 저장
+      if(_gToken){
+        gdriveSaveFile(blob, getFileName()+'.png', 'image/png');
+        gdriveSaveJSON();
+      }
+    },'image/png');
+  }).catch(function(e){
+    console.error(e);
+    btn.disabled=false; btn.textContent='📋 복사';
   });
 }
 
