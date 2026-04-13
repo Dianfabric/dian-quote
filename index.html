@@ -226,7 +226,12 @@ body{font-family:'Malgun Gothic',sans-serif;background:#f0f2f5;min-height:100vh}
   <div class="sec">
     <div class="sec-t">📅 기본 정보</div>
     <div class="field"><label>견적일</label><input type="text" id="quoteDate"/></div>
-    <div class="field"><label>수신처 (고객사명)</label><input type="text" id="clientName" placeholder="예: 코웨이"/></div>
+    <div class="field"><label>수신처 (고객사명)</label>
+      <div class="acw" id="clientAcWrap">
+        <input type="text" id="clientName" placeholder="거래처명 검색 (예: 코웨이)" autocomplete="off"/>
+        <div class="acl" id="clientAcList"></div>
+      </div>
+    </div>
   </div>
 
   <!-- DiAN 담당자 -->
@@ -431,6 +436,97 @@ var API_KEY  = 'AIzaSyCgdspPJQTJzeaJwoxhFo8VYv0heXegrXE';
 var _sN='유대현', _sR='과장', _sT='010-6487-9373';
 var _rMode='none', _fData=null, _ic=0;
 var SAVE_KEY='dian_quotes';
+
+// Airtable 거래처
+var AT_TOKEN='patzh45MdiHK5FJGz.5fd10e69b484fc0c80ffa3b8641981c77c7fa96dbbcb419f9ba1d8883eab91fd';
+var AT_BASE='appcr2VDa4y17bcwm';
+var AT_TABLE='tblSCHwKL8RQXSJKS';
+var _atClients=null;
+var _atLoading=false;
+
+function loadClients(){
+  if(_atClients) return Promise.resolve(_atClients);
+  if(_atLoading) return new Promise(function(r){var iv=setInterval(function(){if(_atClients){clearInterval(iv);r(_atClients);}},100);});
+  _atLoading=true;
+  console.log('[DiAN] 거래처 로딩...');
+  var all=[];
+  function fetchPage(offset){
+    var url='https://api.airtable.com/v0/'+AT_BASE+'/'+AT_TABLE+'?fields[]='+encodeURIComponent('거래처 이름')+'&fields[]='+encodeURIComponent('전화번호')+'&fields[]='+encodeURIComponent('E-mail')+'&fields[]='+encodeURIComponent('직군')+'&pageSize=100';
+    if(offset) url+='&offset='+encodeURIComponent(offset);
+    return fetch(url,{headers:{Authorization:'Bearer '+AT_TOKEN}})
+      .then(function(r){return r.json();})
+      .then(function(d){
+        (d.records||[]).forEach(function(rec){
+          var f=rec.fields||{};
+          var name=(f['거래처 이름']||'').trim();
+          if(name) all.push({id:rec.id, name:name, tel:f['전화번호']||'', email:f['E-mail']||'', type:(f['직군']||[]).join(', ')});
+        });
+        if(d.offset) return fetchPage(d.offset);
+        _atClients=all;
+        _atLoading=false;
+        console.log('[DiAN] 거래처 완료! '+all.length+'개');
+        return all;
+      });
+  }
+  return fetchPage(null).catch(function(e){console.error('[DiAN] 거래처 오류',e);_atLoading=false;return [];});
+}
+
+function parseClient(raw){
+  var titles='대표|사장|부장|과장|팀장|실장|주임|사원|차장|이사|대리|선임|책임|매니저|디자이너|프로듀서|소장|님';
+  var m=raw.match(/^(.+?)\(([^)]+)\)$/);
+  if(m) return {company:m[1].trim(), person:m[2].trim()};
+  var re1=new RegExp('[\\s/]([가-힣]{2,3}(?:'+titles+'))$');
+  var s1=raw.match(re1);
+  if(s1) return {company:raw.slice(0,raw.lastIndexOf(s1[1])).trim(), person:s1[1]};
+  var re2=new RegExp('[\\s/]([가-힣]{2,3})\\s+('+titles+')$');
+  var s2=raw.match(re2);
+  if(s2) return {company:raw.slice(0,raw.indexOf(s2[0])).trim(), person:s2[1]+' '+s2[2]};
+  return {company:raw, person:''};
+}
+
+function onClientInput(){
+  var inp=document.getElementById('clientName');
+  var dd=document.getElementById('clientAcList');
+  var kw=inp.value.trim();
+  if(!kw){dd.style.display='none';return;}
+  dd.innerHTML='<div class="acload">거래처 검색 중...</div>';
+  dd.style.display='block';
+  loadClients().then(function(list){
+    var ku=kw.toUpperCase(), sw=[], inc=[];
+    list.forEach(function(c){
+      var nu=c.name.toUpperCase();
+      if(nu.includes(ku)){
+        (nu.startsWith(ku)?sw:inc).push(c);
+      }
+    });
+    var res=sw.concat(inc).slice(0,12);
+    if(!res.length){dd.innerHTML='<div class="acload">검색 결과 없음</div>';return;}
+    dd.innerHTML='';
+    res.forEach(function(c){
+      var d=document.createElement('div');
+      var pc=parseClient(c.name);
+      d.innerHTML='<span style="font-weight:600">'+pc.company+(pc.person?' <span style="font-weight:400;color:#4A90D9;font-size:11px">'+pc.person+'</span>':'')+'</span>'+
+        '<span style="color:#999;font-size:11px">'+(c.tel||'')+'</span>';
+      d.addEventListener('mousedown',function(e){
+        e.preventDefault();
+        var p=parseClient(c.name);
+        inp.value=p.company;
+        document.getElementById('attn').value=p.person;
+        dd.style.display='none';
+        if(c.tel) document.getElementById('clientTel').value=c.tel;
+      });
+      dd.appendChild(d);
+    });
+  });
+}
+
+(function(){
+  var inp=document.getElementById('clientName');
+  inp.addEventListener('input',onClientInput);
+  inp.addEventListener('focus',function(){if(inp.value.trim()) onClientInput();});
+  inp.addEventListener('blur',function(){setTimeout(function(){document.getElementById('clientAcList').style.display='none';},200);});
+  loadClients();
+})();
 
 // 담당자
 function selStaff(n,r,t,btn){
