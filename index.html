@@ -358,21 +358,21 @@ body{font-family:'Malgun Gothic',sans-serif;background:#f0f2f5;min-height:100vh}
   <div class="lovbody">
     <!-- 탭 -->
     <div class="ltabs">
-      <div class="ltab act" id="tab-local" onclick="switchTab('local')">💾 로컬 저장</div>
-      <div class="ltab" id="tab-drive" onclick="switchTab('drive')">☁️ 구글 드라이브</div>
-    </div>
-    <!-- 로컬 탭 -->
-    <div class="ltab-body act" id="body-local">
-      <input class="lsearch" id="lsearch" type="text" placeholder="🔍 견적서 검색..." oninput="renderList()"/>
-      <div id="savedList"></div>
+      <div class="ltab act" id="tab-drive" onclick="switchTab('drive')">☁️ 구글 드라이브</div>
+      <div class="ltab" id="tab-local" onclick="switchTab('local')">💾 로컬 저장</div>
     </div>
     <!-- 드라이브 탭 -->
-    <div class="ltab-body" id="body-drive">
+    <div class="ltab-body act" id="body-drive">
       <div id="driveListWrap">
         <div class="sempty" id="driveStatus">☁️ 드라이브 연동 버튼을 먼저 눌러주세요</div>
         <input class="lsearch" id="dsearch" type="text" placeholder="🔍 파일 검색..." oninput="filterDriveList()" style="display:none"/>
         <div id="driveList"></div>
       </div>
+    </div>
+    <!-- 로컬 탭 -->
+    <div class="ltab-body" id="body-local">
+      <input class="lsearch" id="lsearch" type="text" placeholder="🔍 견적서 검색..." oninput="renderList()"/>
+      <div id="savedList"></div>
     </div>
   </div>
 </div>
@@ -971,6 +971,30 @@ function submitAtReg(){
     btn.disabled=false;btn.textContent='등록하기';
   });
 }
+function autoRegClient(){
+  var c=document.getElementById('clientName').value.trim();
+  if(!c) return;
+  var p=document.getElementById('attn').value.trim();
+  var ph=document.getElementById('clientTel').value.trim();
+  var name=p?c+'('+p+')':c;
+  if(_atClients){
+    var exists=_atClients.some(function(cl){return cl.name===name;});
+    if(exists) return;
+  }
+  var body={fields:{}};
+  body.fields['거래처 이름']=name;
+  if(ph) body.fields['전화번호']=ph;
+  fetch('https://api.airtable.com/v0/'+AT_BASE+'/'+AT_TABLE,{
+    method:'POST',
+    headers:{Authorization:'Bearer '+AT_TOKEN,'Content-Type':'application/json'},
+    body:JSON.stringify(body)
+  }).then(function(r){return r.json();}).then(function(d){
+    if(d.id){
+      console.log('[DiAN] 거래처 자동등록: '+name);
+      if(_atClients) _atClients.push({id:d.id,name:name,tel:ph,email:'',type:''});
+    }
+  }).catch(function(e){console.error('[DiAN] 거래처 자동등록 오류',e);});
+}
 (function(){
   document.addEventListener('click',function(e){
     if(e.target.dataset.action==='close-at-modal') closeAtReg();
@@ -989,7 +1013,7 @@ function dlPDF(){
   var prev=document.getElementById('qPDF');
   if(!prev) return;
   requireDrive(function(){
-  autoSave();
+  autoSave(); autoRegClient();
   var btn=document.getElementById('pdfBtn');
   btn.disabled=true; btn.textContent='생성 중...';
   html2canvas(prev,{scale:2,useCORS:true,backgroundColor:'#ffffff',width:794,windowWidth:900}).then(function(canvas){
@@ -1032,7 +1056,7 @@ function dlJPG(){
   var prev=document.getElementById('qPDF');
   if(!prev) return;
   requireDrive(function(){
-  autoSave();
+  autoSave(); autoRegClient();
   var btn=document.getElementById('jpgBtn');
   btn.disabled=true; btn.textContent='생성 중...';
   html2canvas(prev,{scale:2,useCORS:true,backgroundColor:'#ffffff'}).then(function(canvas){
@@ -1062,7 +1086,7 @@ function dlCopy(){
   var prev=document.getElementById('qPDF');
   if(!prev) return;
   requireDrive(function(){
-  autoSave();
+  autoSave(); autoRegClient();
   var btn=document.getElementById('copyBtn');
   btn.disabled=true; btn.textContent='복사 중...';
   html2canvas(prev,{scale:2,useCORS:true,backgroundColor:'#ffffff'}).then(function(canvas){
