@@ -978,7 +978,11 @@ function autoRegClient(){
   var ph=document.getElementById('clientTel').value.trim();
   var name=p?c+'('+p+')':c;
   if(_atClients){
-    var exists=_atClients.some(function(cl){return cl.name===name;});
+    var phNum=ph.replace(/[^0-9]/g,'');
+    var exists=_atClients.some(function(cl){
+      if(phNum&&cl.tel&&cl.tel.replace(/[^0-9]/g,'')===phNum) return true;
+      return cl.name===name;
+    });
     if(exists) return;
   }
   var body={fields:{}};
