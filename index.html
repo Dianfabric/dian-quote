@@ -995,7 +995,7 @@ function autoRegClient(){
     }
   }).catch(function(e){console.error('[DiAN] 거래처 자동등록 오류',e);});
 }
-(function(){
+function initAtModal(){
   document.addEventListener('click',function(e){
     if(e.target.dataset.action==='close-at-modal') closeAtReg();
     if(e.target.dataset.action==='submit-at-reg') submitAtReg();
@@ -1003,10 +1003,11 @@ function autoRegClient(){
   document.addEventListener('input',function(e){
     if(e.target.id==='atCompany'||e.target.id==='atPerson') updateAtPreview();
   });
-  document.getElementById('atModalBg').addEventListener('click',function(e){
+  var bg=document.getElementById('atModalBg');
+  if(bg) bg.addEventListener('click',function(e){
     if(e.target===this) closeAtReg();
   });
-})();
+}
 
 // PDF
 function dlPDF(){
@@ -1490,6 +1491,7 @@ window.addEventListener('DOMContentLoaded',function(){
   document.getElementById('remark').value='부가세 포함 금액입니다.\n커팅 해 출고 된 원단은 반품이 불가합니다.\n발주 후 2~3일 후 출고 됩니다.';
   document.querySelector('.sb').classList.add('act');
   addItem(); addItem(); addItem();
+  initAtModal();
   // items 컨테이너 이벤트 위임
   document.getElementById('items').addEventListener('click', function(e){
     var delbtn = e.target.closest('.delbtn');
