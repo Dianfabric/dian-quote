@@ -326,7 +326,7 @@ body{font-family:'Malgun Gothic',sans-serif;background:#f0f2f5;min-height:100vh}
         <button class="rbtn" onclick="setRound('10000',this)">만원 단위</button>
         <button class="rbtn" onclick="setRound('custom',this)">직접 입력</button>
       </div>
-      <div class="rcw" id="rcw"><input type="number" id="rcInput" placeholder="금액 직접 입력" oninput="calcTot()"/></div>
+      <div class="rcw" id="rcw"><input type="number" id="rcInput" placeholder="뺄 금액 입력 (예: 800)" oninput="calcTot()"/></div>
       <div class="rres" id="rres"></div>
     </div>
   </div>
@@ -739,7 +739,7 @@ function applyRound(g){
   if(_rMode==='10000') return Math.floor(g/10000)*10000;
   if(_rMode==='custom'){
     var v=parseFloat(document.getElementById('rcInput').value);
-    return isNaN(v)?g:v;
+    return isNaN(v)?g:g-v;
   }
   return g;
 }
