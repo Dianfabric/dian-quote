@@ -717,7 +717,7 @@ function getRows(){
       item:col?n+' '+col:n,
       spec:inp[2].value.trim(),
       qty:qty,
-      unit:inp[4].value.trim(),
+      unit:inp[4].value.trim()||'Y',
       price:price,
       amount:(parseFloat(inp[3].value)||0)*price,
       remark:inp[6].value.trim()
