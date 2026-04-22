@@ -703,7 +703,15 @@ function initRemark(row){
   }
   ta.addEventListener('input',autoResize);
   ta.addEventListener('keydown',function(e){
-    if(e.key==='Enter'&&!e.altKey){e.preventDefault();}
+    if(e.key==='Enter'&&e.altKey){
+      e.preventDefault();
+      var s=ta.selectionStart, en=ta.selectionEnd;
+      ta.value=ta.value.slice(0,s)+'\n'+ta.value.slice(en);
+      ta.selectionStart=ta.selectionEnd=s+1;
+      autoResize();
+    } else if(e.key==='Enter'){
+      e.preventDefault();
+    }
   });
   autoResize();
 }
