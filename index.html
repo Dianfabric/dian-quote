@@ -49,7 +49,10 @@ body{font-family:'Malgun Gothic',sans-serif;background:#f0f2f5;min-height:100vh}
 .ih{display:grid;grid-template-columns:22px 3fr 1fr 1fr 1fr 1fr 1fr 3fr 22px;gap:4px;margin-bottom:4px}
 .ih span{font-size:10px;color:#999;font-weight:600;text-align:center}
 .ir{display:grid;grid-template-columns:22px 3fr 1fr 1fr 1fr 1fr 1fr 3fr 22px;gap:4px;align-items:center;margin-bottom:5px;background:#fafafa;border-radius:7px;padding:7px 5px;border:1px solid #f0f0f0}
-.inum{width:22px;height:22px;background:#e8ecf0;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#666}
+.inum{width:22px;height:22px;background:#e8ecf0;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#666;cursor:grab;user-select:none}
+.inum:active{cursor:grabbing}
+.ir.drag-over{border:2px dashed #4A90D9;background:#f0f6ff}
+.ir.dragging{opacity:.4}
 .ir input{width:100%;padding:6px 5px;border:1px solid #e0e0e0;border-radius:4px;font-size:11px;font-family:inherit;background:#fff;text-align:center}
 .ir input.l{text-align:left}
 .ir input:focus{outline:none;border-color:#4A90D9}
@@ -668,11 +671,11 @@ function addItem(){
       '<input type="text" class="l" placeholder="비고"/>'+
       '<button class="delbtn" data-id="'+id+'">×</button>';
   }
-  // 삭제 버튼 이벤트 data-id 방식으로 처리
   div.querySelector('.delbtn').addEventListener('click', function(){
     delItem(this.getAttribute('data-id'));
   });
   cont.appendChild(div);
+  initDrag(div);
   calcTot();
 }
 
@@ -686,6 +689,43 @@ function renum(){
     r.querySelector('.inum').textContent=i+1;
   });
 }
+
+// 드래그앤드롭 순서 변경
+var _dragSrc=null;
+function initDrag(row){
+  var handle=row.querySelector('.inum');
+  handle.setAttribute('draggable','true');
+  handle.addEventListener('dragstart',function(e){
+    _dragSrc=row;
+    row.classList.add('dragging');
+    e.dataTransfer.effectAllowed='move';
+  });
+  handle.addEventListener('dragend',function(){
+    row.classList.remove('dragging');
+    document.querySelectorAll('.ir').forEach(function(r){r.classList.remove('drag-over');});
+  });
+  row.addEventListener('dragover',function(e){
+    e.preventDefault();
+    e.dataTransfer.dropEffect='move';
+    if(row!==_dragSrc) row.classList.add('drag-over');
+  });
+  row.addEventListener('dragleave',function(){
+    row.classList.remove('drag-over');
+  });
+  row.addEventListener('drop',function(e){
+    e.preventDefault();
+    row.classList.remove('drag-over');
+    if(!_dragSrc||_dragSrc===row) return;
+    var cont=document.getElementById('items');
+    var rows=Array.from(cont.querySelectorAll('.ir'));
+    var srcIdx=rows.indexOf(_dragSrc);
+    var tgtIdx=rows.indexOf(row);
+    if(srcIdx<tgtIdx) cont.insertBefore(_dragSrc,row.nextSibling);
+    else cont.insertBefore(_dragSrc,row);
+    renum(); calcTot();
+  });
+}
+
 function calcTot(){
   var sub=0;
   document.querySelectorAll('.ir').forEach(function(r){
