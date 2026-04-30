@@ -468,7 +468,7 @@ async function gdriveSaveFile(blob, fileName, mimeType) {
   }
 }
 var API_KEY  = 'AIzaSyCgdspPJQTJzeaJwoxhFo8VYv0heXegrXE';
-var _sN='유대현', _sR='과장', _sT='010-6487-9373';
+var _sN='', _sR='', _sT='';
 var _rMode='none', _fData=null, _ic=0;
 var SAVE_KEY='dian_quotes';
 
@@ -915,6 +915,7 @@ function getFileName(){
 
 // 미리보기 생성
 function genPreview(){
+  if(!_sN){toast('DIAN 담당자를 먼저 선택해주세요! 🙋');return;}
   var panel=document.getElementById('formPanel');
   panel.style.width='';
   panel.classList.add('col');
@@ -1559,9 +1560,6 @@ window.addEventListener('DOMContentLoaded',function(){
   var t=new Date();
   document.getElementById('quoteDate').value=t.getFullYear()+'년 '+(t.getMonth()+1)+'월 '+t.getDate()+'일';
   document.getElementById('remark').value='부가세 포함 금액입니다.\n커팅 해 출고 된 원단은 반품이 불가합니다.\n발주 후 2~3일 후 출고 됩니다.';
-  document.querySelectorAll('.sb').forEach(function(b){
-    if(b.querySelector('.sn')&&b.querySelector('.sn').textContent.indexOf(_sN)===0) b.classList.add('act');
-  });
   addItem(); addItem(); addItem();
   initAtModal();
   // items 컨테이너 이벤트 위임
