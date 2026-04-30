@@ -273,10 +273,10 @@ body{font-family:'Malgun Gothic',sans-serif;background:#f0f2f5;min-height:100vh}
   <div class="sec">
     <div class="sec-t">🙋 DiAN 담당자</div>
     <div class="sg" id="staffGrid">
-      <button type="button" class="sb" onclick="selStaff('유대현','과장','010-6487-9373',this)"><span class="sn">유대현 과장</span><span class="sr">010-6487-9373</span></button>
       <button type="button" class="sb" onclick="selStaff('한태원','대표','010-7367-2115',this)"><span class="sn">한태원 대표</span><span class="sr">010-7367-2115</span></button>
       <button type="button" class="sb" onclick="selStaff('한태종','부장','010-2085-8963',this)"><span class="sn">한태종 부장</span><span class="sr">010-2085-8963</span></button>
       <button type="button" class="sb" onclick="selStaff('최현진','팀장','010-9259-3580',this)"><span class="sn">최현진 팀장</span><span class="sr">010-9259-3580</span></button>
+      <button type="button" class="sb" onclick="selStaff('유대현','과장','010-6487-9373',this)"><span class="sn">유대현 과장</span><span class="sr">010-6487-9373</span></button>
       <button type="button" class="sb" onclick="selStaff('전새로미','사원','010-4383-2115',this)"><span class="sn">전새로미 사원</span><span class="sr">010-4383-2115</span></button>
       <button type="button" class="sb" id="custBtn" onclick="selStaff('','','',this)"><span class="sn">기타 (직접 입력)</span><span class="sr">이름 · 직책 · 연락처</span></button>
     </div>
@@ -1559,7 +1559,9 @@ window.addEventListener('DOMContentLoaded',function(){
   var t=new Date();
   document.getElementById('quoteDate').value=t.getFullYear()+'년 '+(t.getMonth()+1)+'월 '+t.getDate()+'일';
   document.getElementById('remark').value='부가세 포함 금액입니다.\n커팅 해 출고 된 원단은 반품이 불가합니다.\n발주 후 2~3일 후 출고 됩니다.';
-  document.querySelector('.sb').classList.add('act');
+  document.querySelectorAll('.sb').forEach(function(b){
+    if(b.querySelector('.sn')&&b.querySelector('.sn').textContent.indexOf(_sN)===0) b.classList.add('act');
+  });
   addItem(); addItem(); addItem();
   initAtModal();
   // items 컨테이너 이벤트 위임
