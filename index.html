@@ -334,6 +334,13 @@ body{font-family:'Malgun Gothic',sans-serif;background:#f0f2f5;min-height:100vh}
       <div class="rcw" id="rcw"><input type="number" id="rcInput" placeholder="뺄 금액 입력 (예: 800)" oninput="calcTot()"/></div>
       <div class="rres" id="rres"></div>
     </div>
+    <div class="rwrap" style="margin-top:8px">
+      <div class="rt">💰 부가세 표시</div>
+      <div class="rbtns">
+        <button class="rbtn act" onclick="setVat('incl',this)">VAT 포함</button>
+        <button class="rbtn" onclick="setVat('excl',this)">VAT 별도</button>
+      </div>
+    </div>
   </div>
 
   <!-- 비고 -->
@@ -469,7 +476,7 @@ async function gdriveSaveFile(blob, fileName, mimeType) {
 }
 var API_KEY  = 'AIzaSyCgdspPJQTJzeaJwoxhFo8VYv0heXegrXE';
 var _sN='', _sR='', _sT='';
-var _rMode='none', _fData=null, _ic=0;
+var _rMode='none', _fData=null, _ic=0, _vatMode='incl';
 var SAVE_KEY='dian_quotes';
 
 // Airtable 거래처
@@ -795,10 +802,18 @@ function getRows(){
 // 단수정리
 function setRound(m,btn){
   _rMode=m;
-  document.querySelectorAll('.rbtn').forEach(function(b){b.classList.remove('act');});
+  btn.parentNode.querySelectorAll('.rbtn').forEach(function(b){b.classList.remove('act');});
   btn.classList.add('act');
   document.getElementById('rcw').style.display=m==='custom'?'block':'none';
   calcTot();
+}
+
+// VAT 표시 모드
+function setVat(m,btn){
+  _vatMode=m;
+  btn.parentNode.querySelectorAll('.rbtn').forEach(function(b){b.classList.remove('act');});
+  btn.classList.add('act');
+  if(document.getElementById('qPDF')) genPreview();
 }
 function applyRound(g){
   if(_rMode==='1000') return Math.floor(g/1000)*1000;
@@ -953,19 +968,36 @@ function genPreview(){
     trs += '</tr>';
   }
 
+  var defaultVatLine=_vatMode==='excl'?'* 부가세 별도 금액입니다.':'* 부가세 포함 금액입니다.';
   var rmhtml=rm
-    ? rm.split('\n').map(function(l){return '<p>* '+l.replace(/^\*\s*/,'')+'</p>';}).join('')
-    : '<p>* 부가세 포함 금액입니다.</p><p>* 커팅 해 출고 된 원단은 반품이 불가합니다.</p><p>* 발주 후 2~3일 후 출고 됩니다.</p>';
+    ? rm.split('\n').map(function(l){
+        var line=l.replace(/^\*\s*/,'');
+        if(/부가세\s*(포함|별도)\s*금액/.test(line)) line=defaultVatLine.replace(/^\*\s*/,'');
+        return '<p>* '+line+'</p>';
+      }).join('')
+    : '<p>'+defaultVatLine+'</p><p>* 커팅 해 출고 된 원단은 반품이 불가합니다.</p><p>* 발주 후 2~3일 후 출고 됩니다.</p>';
+
+  // VAT 별도 모드: 표 하단에 공급가액 + 부가세 행 추가
+  var vatRows='';
+  if(_vatMode==='excl'){
+    var supply=grand-vat;
+    vatRows+='<tr style="background:#fafafa;font-weight:600"><td colspan="6" style="text-align:right;padding-right:14px;letter-spacing:2px">공 급 가 액</td><td>'+supply.toLocaleString()+'</td><td></td></tr>';
+    vatRows+='<tr style="color:#666;background:#fcfcfc"><td colspan="6" style="text-align:right;padding-right:14px;letter-spacing:2px">부 가 세 ( 1 0 % )</td><td>'+vat.toLocaleString()+'</td><td></td></tr>';
+  }
+  var topLabel=_vatMode==='excl'?'공급가액 (VAT 별도)':'합계금액 (VAT 포함)';
+  var topAmount=_vatMode==='excl'?(grand-vat):grand;
+  var topKor=numKor(topAmount);
 
   var html='<div class="qp" id="qPDF">';
   html+='<div class="qph"><img class="qli" src="'+LOGO+'"/><div class="qtr"><div class="qtit">견 &nbsp; 적 &nbsp; 서</div><div class="qdat">'+qd+'</div></div></div>';
   html+='<div class="qcow"><div class="qco">상호 : 디안 &nbsp;&nbsp; 사업자번호 : 211-08-78685 &nbsp;&nbsp; 대표 : 한 태 원<br>주소 : 서울시 강남구 학동로 224 삼환아르누보3 3층<br>공장 : 충청남도 공주시 유구읍 녹천리 54-1<br>이메일 : Dian@diantex.co.kr &nbsp;&nbsp; Tel : 02-6447-1221 &nbsp;&nbsp; Fax : 02-6447-1222</div></div>';
   html+='<div class="qcr"><div class="qcli">'+cn+'</div><div class="qsi">담당 : '+sd+'<br>'+_sT+'</div></div>';
   html+='<div class="qir"><div class="qib"><span class="ql">담당자명</span><span class="qv">'+at+'</span></div><div class="qib"><span class="ql">전화번호</span><span class="qv">'+ct+'</span></div><div class="qib"><span class="ql">현장명</span><span class="qv">'+sn+'</span></div></div>';
-  html+='<div class="qtb"><span class="tl">합계금액 (VAT 포함)</span><span><span class="tv">'+grand.toLocaleString()+'원</span><span class="tk">('+kor.replace('원정','')+'원정)</span></span></div>';
+  html+='<div class="qtb"><span class="tl">'+topLabel+'</span><span><span class="tv">'+topAmount.toLocaleString()+'원</span><span class="tk">('+topKor.replace('원정','')+'원정)</span></span></div>';
   html+='<div class="qnap">납품내용 :</div>';
   html+='<table class="qtable"><thead><tr><th style="width:36px">NO</th><th>ITEM</th><th style="width:80px">규격</th><th style="width:46px">수량</th><th style="width:44px">단위</th><th style="width:86px">단가</th><th style="width:92px">금액</th><th style="width:100px">비고</th></tr></thead><tbody>';
   html+=trs;
+  html+=vatRows;
   html+='<tr class="trow"><td colspan="6" style="text-align:center;letter-spacing:4px">총 합 계</td><td>'+grand.toLocaleString()+'</td><td>VAT 포함</td></tr>';
   html+='</tbody></table>';
   html+='<div class="qrem"><div class="rt">REMARK</div>'+rmhtml+'</div>';
@@ -1219,7 +1251,7 @@ function saveQuote(silent){
       clientTel:document.getElementById('clientTel').value,
       siteName:document.getElementById('siteName').value,
       remark:document.getElementById('remark').value,
-      rMode:_rMode, items:items
+      rMode:_rMode, vatMode:_vatMode, items:items
     }
   };
   var qs=getSaved();
@@ -1267,13 +1299,20 @@ function loadQuote(id){
   document.getElementById('remark').value=d.remark||'';
   if(d.rMode){
     _rMode=d.rMode;
-    document.querySelectorAll('.rbtn').forEach(function(b){b.classList.remove('act');});
     var mmap={'none':'정리 없음','1000':'천원 단위','10000':'만원 단위','custom':'직접 입력'};
-    document.querySelectorAll('.rbtn').forEach(function(b){
+    var rbtns0=document.querySelectorAll('.rwrap')[0];
+    if(rbtns0) rbtns0.querySelectorAll('.rbtn').forEach(function(b){
+      b.classList.remove('act');
       if(b.textContent.trim()===mmap[d.rMode]) b.classList.add('act');
     });
     document.getElementById('rcw').style.display=d.rMode==='custom'?'block':'none';
   }
+  _vatMode=d.vatMode||'incl';
+  var rbtns1=document.querySelectorAll('.rwrap')[1];
+  if(rbtns1) rbtns1.querySelectorAll('.rbtn').forEach(function(b){
+    b.classList.remove('act');
+    if((_vatMode==='excl'&&b.textContent.trim()==='VAT 별도')||(_vatMode!=='excl'&&b.textContent.trim()==='VAT 포함')) b.classList.add('act');
+  });
   var cont=document.getElementById('items');
   cont.innerHTML=''; _ic=0;
   (d.items||[]).forEach(function(it){
@@ -1515,11 +1554,20 @@ async function loadDriveFile(fileId){
     document.getElementById('remark').value=d.remark||'';
     if(d.rMode){
       _rMode=d.rMode;
-      document.querySelectorAll('.rbtn').forEach(function(b){b.classList.remove('act');});
       var mmap={'none':'정리 없음','1000':'천원 단위','10000':'만원 단위','custom':'직접 입력'};
-      document.querySelectorAll('.rbtn').forEach(function(b){if(b.textContent.trim()===mmap[d.rMode])b.classList.add('act');});
+      var dr0=document.querySelectorAll('.rwrap')[0];
+      if(dr0) dr0.querySelectorAll('.rbtn').forEach(function(b){
+        b.classList.remove('act');
+        if(b.textContent.trim()===mmap[d.rMode])b.classList.add('act');
+      });
       document.getElementById('rcw').style.display=d.rMode==='custom'?'block':'none';
     }
+    _vatMode=d.vatMode||'incl';
+    var dr1=document.querySelectorAll('.rwrap')[1];
+    if(dr1) dr1.querySelectorAll('.rbtn').forEach(function(b){
+      b.classList.remove('act');
+      if((_vatMode==='excl'&&b.textContent.trim()==='VAT 별도')||(_vatMode!=='excl'&&b.textContent.trim()==='VAT 포함')) b.classList.add('act');
+    });
     var cont=document.getElementById('items'); cont.innerHTML=''; _ic=0;
     (d.items||[]).forEach(function(it){
       addItem();
