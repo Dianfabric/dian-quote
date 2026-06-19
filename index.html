@@ -977,15 +977,17 @@ function genPreview(){
       }).join('')
     : '<p>'+defaultVatLine+'</p><p>* 커팅 해 출고 된 원단은 반품이 불가합니다.</p><p>* 발주 후 2~3일 후 출고 됩니다.</p>';
 
-  // VAT 별도 모드: 표 하단에 공급가액 + 부가세 행 추가
+  // VAT 별도 모드: 총합계 기준으로 공급가액/부가세 역산 (세금계산서 표준)
+  // supply = grand / 1.1, vat = grand - supply  → supply + vat = grand 정확히 일치, 비율 정확히 10%
+  var supply=Math.round(grand/1.1);
+  var vatExact=grand-supply;
   var vatRows='';
   if(_vatMode==='excl'){
-    var supply=grand-vat;
     vatRows+='<tr style="background:#fafafa;font-weight:600"><td colspan="6" style="text-align:right;padding-right:14px;letter-spacing:2px">공 급 가 액</td><td>'+supply.toLocaleString()+'</td><td></td></tr>';
-    vatRows+='<tr style="color:#666;background:#fcfcfc"><td colspan="6" style="text-align:right;padding-right:14px;letter-spacing:2px">부 가 세 ( 1 0 % )</td><td>'+vat.toLocaleString()+'</td><td></td></tr>';
+    vatRows+='<tr style="color:#666;background:#fcfcfc"><td colspan="6" style="text-align:right;padding-right:14px;letter-spacing:2px">부 가 세 ( 1 0 % )</td><td>'+vatExact.toLocaleString()+'</td><td></td></tr>';
   }
   var topLabel=_vatMode==='excl'?'공급가액 (VAT 별도)':'합계금액 (VAT 포함)';
-  var topAmount=_vatMode==='excl'?(grand-vat):grand;
+  var topAmount=_vatMode==='excl'?supply:grand;
   var topKor=numKor(topAmount);
 
   var html='<div class="qp" id="qPDF">';
