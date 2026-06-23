@@ -790,7 +790,7 @@ function getRows(){
       item:col?n+' '+col:n,
       spec:inp[2].value.trim(),
       qty:qty,
-      unit:inp[4].value.trim()||'Y',
+      unit:inp[4].value.trim(),
       price:price,
       amount:(parseFloat(inp[3].value)||0)*price,
       remark:inp[6].value.trim()
@@ -856,6 +856,7 @@ function onAcInput(inp){
         var row=wrap.closest('.ir');
         var ins=row.querySelectorAll('input,textarea');
         ins[2].value=it.spec;
+        if(!ins[4].value.trim()) ins[4].value='Y';
         ins[5].value=it.price;
         dd.style.display='none';
         calcTot();
