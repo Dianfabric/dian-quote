@@ -614,18 +614,15 @@ function loadFabric(){
         try{
           var d=JSON.parse(x.responseText);
           _fData={};
+          _fData=[];
           (d.values||[]).forEach(function(row){
             var n=(row[0]||'').trim();
             var p=(row[1]||'').toString().replace(/,/g,'').trim();
             var s=(row[3]||'').toString().trim();
             var a=(row[5]||'').trim();
-            if(n){
-              var e={name:n,price:p,spec:s?s+'mm':'1400mm',alias:a};
-              _fData[n.toUpperCase()]=e;
-              if(a) _fData[a.toUpperCase()]=e;
-            }
+            if(n) _fData.push({name:n,price:p,spec:s?s+'mm':'1400mm',alias:a});
           });
-          console.log('[DiAN] 완료! '+Object.keys(_fData).length+'개');
+          console.log('[DiAN] 완료! '+_fData.length+'개');
           resolve(_fData);
         }catch(e){console.error(e);resolve({});}
       }else{console.error('API오류',x.status);resolve({});}
@@ -835,21 +832,24 @@ function onAcInput(inp){
   dd.style.display='block';
   loadFabric().then(function(data){
     var ku=kw.toUpperCase(), sw=[], inc=[];
-    Object.values(data).forEach(function(it){
-      var already=sw.some(function(x){return x.name===it.name;})||inc.some(function(x){return x.name===it.name;});
-      if(already) return;
+    var arr=Array.isArray(data)?data:Object.values(data);
+    function dupCheck(list,it){
+      return list.some(function(x){return x.name===it.name && String(x.price)===String(it.price) && x.spec===it.spec;});
+    }
+    arr.forEach(function(it){
+      if(dupCheck(sw,it)||dupCheck(inc,it)) return;
       var nu=it.name.toUpperCase(), au=it.alias?it.alias.toUpperCase():'';
       if(nu.includes(ku)||au.includes(ku)){
         (nu.startsWith(ku)||au.startsWith(ku)?sw:inc).push(it);
       }
     });
-    var uniq=sw.concat(inc).slice(0,10);
+    var uniq=sw.concat(inc).slice(0,15);
     if(!uniq.length){dd.style.display='none';return;}
     dd.innerHTML='';
     uniq.forEach(function(it){
       var d=document.createElement('div');
       d.innerHTML='<span style="font-weight:600">'+it.name+(it.alias?' ('+it.alias+')':'')+'</span>'+
-        '<span style="color:#999;font-size:11px">'+it.spec+' | '+parseInt(it.price||0).toLocaleString()+'원/Y</span>';
+        '<span style="color:#999;font-size:11px">'+it.spec+' | <b style="color:#1a1a2e">'+parseInt(it.price||0).toLocaleString()+'원/Y</b></span>';
       d.onmousedown=function(e){
         e.preventDefault();
         inp.value=it.name;
