@@ -1311,7 +1311,7 @@ async function gdriveSaveJSON(){
     clientTel:document.getElementById('clientTel').value,
     siteName:document.getElementById('siteName').value,
     remark:document.getElementById('remark').value,
-    rMode:_rMode, items:items
+    rMode:_rMode, vatMode:_vatMode, items:items
   };
   var jsonBlob=new Blob([JSON.stringify({data:qData},null,2)],{type:'application/json'});
   await gdriveSaveFile(jsonBlob, getFileName()+'.json', 'application/json');
@@ -1578,7 +1578,8 @@ async function loadDriveFile(fileId){
     var res=await fetch('https://www.googleapis.com/drive/v3/files/'+fileId+'?alt=media&supportsAllDrives=true',
       {headers:{Authorization:'Bearer '+_gToken}});
     var q=await res.json();
-    var d=q.data;
+    if(q.error){ toast('불러오기 실패: '+q.error.message); return; }
+    var d=q.data||q;
     document.getElementById('quoteDate').value=d.quoteDate||'';
     document.getElementById('clientName').value=d.clientName||'';
     document.getElementById('attn').value=d.attn||'';
