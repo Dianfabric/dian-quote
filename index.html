@@ -642,7 +642,7 @@ function loadFabric(){
     }
     var rows=data.rows.filter(function(row){return String(row[0]||'').trim();}).map(function(row){
       var s=String(row[3]||'').trim();
-      return {name:String(row[0]).trim(),price:String(row[1]||'').replace(/,/g,'').trim(),spec:s?s+'mm':'1400mm',alias:String(row[5]||'').trim()};
+      return {name:String(row[0]).trim(),price:String(row[1]||'').replace(/,/g,'').trim(),spec:s?s+'mm':'1400mm',alias:String(row[5]||'').trim(),brand:String(row[6]||'').trim()};
     });
     _fData=rows;
     _fLoadedAt=Date.now();
@@ -854,7 +854,7 @@ function onAcInput(inp){
     var ku=kw.toUpperCase(), sw=[], inc=[];
     var arr=Array.isArray(data)?data:Object.values(data);
     function dupCheck(list,it){
-      return list.some(function(x){return x.name===it.name && String(x.price)===String(it.price) && x.spec===it.spec;});
+      return list.some(function(x){return x.name===it.name && String(x.price)===String(it.price) && x.spec===it.spec && x.brand===it.brand;});
     }
     arr.forEach(function(it){
       if(dupCheck(sw,it)||dupCheck(inc,it)) return;
@@ -863,13 +863,17 @@ function onAcInput(inp){
         (nu.startsWith(ku)||au.startsWith(ku)?sw:inc).push(it);
       }
     });
-    var uniq=sw.concat(inc).slice(0,15);
+    var uniq=sw.concat(inc).sort(function(a,b){return Number(b.name.toUpperCase()===ku)-Number(a.name.toUpperCase()===ku);}).slice(0,15);
     if(!uniq.length){dd.style.display='none';return;}
     dd.innerHTML='';
     uniq.forEach(function(it){
       var d=document.createElement('div');
       d.innerHTML='<span style="font-weight:600">'+it.name+(it.alias?' ('+it.alias+')':'')+'</span>'+
         '<span style="color:#999;font-size:11px">'+it.spec+' | <b style="color:#1a1a2e">'+parseInt(it.price||0).toLocaleString()+'원/Y</b></span>';
+      var brand=document.createElement('span');
+      brand.textContent=' · '+(it.brand||'브랜드 미등록');
+      brand.style.cssText='color:#555;font-weight:600';
+      d.lastElementChild.appendChild(brand);
       d.onmousedown=function(e){
         e.preventDefault();
         inp.value=it.name;

@@ -22,7 +22,7 @@ test('loads Supabase API and maps public quote fields',async()=>{
   const rows=await c.loadFabric();
   assert.equal(calls[0].url,'https://fabric-search-six.vercel.app/api/search');
   assert.equal(calls[0].opts.cache,'no-store');
-  assert.deepEqual(JSON.parse(JSON.stringify(rows)),[{name:'W1148',price:'37000',spec:'142mm',alias:'alias'}]);
+  assert.deepEqual(JSON.parse(JSON.stringify(rows)),[{name:'W1148',price:'37000',spec:'142mm',alias:'alias',brand:'WF'}]);
 });
 test('deduplicates in-flight reads, expires successful cache after 60s',async()=>{
   let count=0;
@@ -81,5 +81,19 @@ test('autocomplete reports a failed read without an unhandled rejection',async()
   vm.createContext(ctx);vm.runInContext(html.slice(start,end),ctx);ctx.onAcInput(inp);
   await new Promise(r=>setImmediate(r));
   assert.match(dd.textContent,/단가.*다시/);
+});
+test('brand distinguishes equal-name/price rows and renders safely with missing fallback',async()=>{
+  const html=fs.readFileSync(require('node:path').join(__dirname,'../index.html'),'utf8');
+  const start=html.indexOf('function onAcInput(inp){'),end=html.indexOf('function onAcKey(',start);
+  const nodes=[];
+  const dd={style:{},innerHTML:'',appendChild(n){nodes.push(n);}};
+  const inp={value:'Same',parentNode:{querySelector:()=>dd}};
+  const row={name:'Same',price:'10000',spec:'1400mm',alias:''};
+  const ctx={loadFabric:async()=>[{...row,name:'Same-prefix',brand:'HX'},{...row,brand:'HX'},{...row,brand:'JL'},{...row,brand:'HX'},{...row,brand:''}],document:{createElement(){return {style:{},lastElementChild:{appendChild(n){this.brand=n;}}};}}};
+  vm.createContext(ctx);vm.runInContext(html.slice(start,end),ctx);ctx.onAcInput(inp);
+  await new Promise(r=>setImmediate(r));
+  assert.equal(nodes.length,4);
+  assert.deepEqual(nodes.map(n=>n.lastElementChild.brand.textContent),[' · HX',' · JL',' · 브랜드 미등록',' · HX']);
+  assert.match(nodes[3].innerHTML,/Same-prefix/);
 });
 module.exports={loader,payload};
