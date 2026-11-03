@@ -1018,6 +1018,9 @@ function genPreview(){
   var topLabel=_vatMode==='excl'?'공급가액 (VAT 별도)':'합계금액 (VAT 포함)';
   var topAmount=_vatMode==='excl'?supply:grand;
   var topKor=numKor(topAmount);
+  // 하단 총합계는 상단과 반대 기준으로 표시 (상단 VAT 포함 → 하단 VAT 별도)
+  var bottomAmount=_vatMode==='excl'?grand:supply;
+  var bottomLabel=_vatMode==='excl'?'VAT 포함':'VAT 별도';
 
   var html='<div class="qp" id="qPDF">';
   html+='<div class="qph"><img class="qli" src="'+LOGO+'"/><div class="qtr"><div class="qtit">견 &nbsp; 적 &nbsp; 서</div><div class="qdat">'+qd+'</div></div></div>';
@@ -1029,7 +1032,7 @@ function genPreview(){
   html+='<table class="qtable"><thead><tr><th style="width:36px">NO</th><th>ITEM</th><th style="width:80px">규격</th><th style="width:46px">수량</th><th style="width:44px">단위</th><th style="width:86px">단가</th><th style="width:92px">금액</th><th style="width:100px">비고</th></tr></thead><tbody>';
   html+=trs;
   html+=vatRows;
-  html+='<tr class="trow"><td colspan="6" style="text-align:center;letter-spacing:4px">총 합 계</td><td>'+grand.toLocaleString()+'</td><td>VAT 포함</td></tr>';
+  html+='<tr class="trow"><td colspan="6" style="text-align:center;letter-spacing:4px">총 합 계</td><td>'+bottomAmount.toLocaleString()+'</td><td>'+bottomLabel+'</td></tr>';
   html+='</tbody></table>';
   html+='<div class="qrem"><div class="rt">REMARK</div>'+rmhtml+'</div>';
   html+='<div class="qbank">※ 계좌번호 : 기업 &nbsp; 02-6447-1221 &nbsp; 예금주 한태원 디안</div>';
